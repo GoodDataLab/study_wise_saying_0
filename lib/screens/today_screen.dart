@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 //import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -194,141 +195,7 @@ class _TodayScreenState extends State<TodayScreen>
                       color: kBackgroundColor,
                       child: Stack(
                         children: [
-                          Container(
-                            color: kBackgroundColor,
-                            child: Padding(
-                              padding: EdgeInsets.all(30.0.r),
-                              child: StreamBuilder<DocumentSnapshot>(
-                                  stream: FirebaseFirestore.instance
-                                      .collection('post')
-                                      .doc(postId)
-                                      .snapshots(),
-                                  builder: (context, snapshot) {
-                                    return AnimationLimiter(
-                                      child: GridView.builder(
-                                          itemCount: appData.savedPost.length,
-                                          gridDelegate:
-                                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                                  crossAxisCount: 2),
-                                          itemBuilder: (context, index) {
-                                            Post post = Post(
-                                                title: (snapshot.data!.data()
-                                                    as Map<String,
-                                                        dynamic>)['title'],
-                                                subtitle: (snapshot.data!.data()
-                                                    as Map<String,
-                                                        dynamic>)['subtitle'],
-                                                content: (snapshot.data!.data()
-                                                    as Map<String,
-                                                        dynamic>)['content']);
-                                            if (post == null)
-                                              return Container();
-
-                                            return AnimationConfiguration
-                                                .staggeredGrid(
-                                              position: index,
-                                              columnCount: 2,
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  setState(() {});
-                                                  _myselectedPost = post;
-                                                  _isMySelected =
-                                                      !_isMySelected;
-                                                },
-                                                child: ScaleAnimation(
-                                                  duration: Duration(
-                                                      milliseconds: 500),
-                                                  child: Container(
-                                                    height: 313.h,
-                                                    width: 313.w,
-                                                    child: Card(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          36.r)),
-                                                      child: Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                left: 20.w,
-                                                                top: 20.h,
-                                                                right: 20.w),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            SizedBox(
-                                                              height: 70.h,
-                                                            ),
-                                                            Row(
-                                                              children: [
-                                                                const CircleAvatar(
-                                                                  child: null,
-                                                                  radius: 15,
-                                                                ),
-                                                                SizedBox(
-                                                                    width:
-                                                                        15.w),
-                                                                Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Row(
-                                                                      children: [
-                                                                        Text(
-                                                                          '',
-                                                                          style: TextStyle(
-                                                                              fontSize: 18.sp,
-                                                                              fontWeight: FontWeight.bold),
-                                                                        ),
-                                                                        Icon(
-                                                                          Icons
-                                                                              .star_border_purple500_outlined,
-                                                                          size:
-                                                                              15,
-                                                                        )
-                                                                      ],
-                                                                    ),
-                                                                    Text(
-                                                                      '',
-                                                                      style: TextStyle(
-                                                                          fontSize: 18
-                                                                              .sp,
-                                                                          fontWeight:
-                                                                              FontWeight.bold),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            SizedBox(
-                                                                height: 22.h),
-                                                            Text(
-                                                              '',
-                                                              style: TextStyle(
-                                                                  fontSize:
-                                                                      20.sp),
-                                                              maxLines: 3,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          }),
-                                    );
-                                  }),
-                            ),
-                          ),
+                          MyCard(postId, appData),
                           AnimatedOpacity(
                             duration: Duration(milliseconds: 200),
                             opacity: _isMySelected ? 1 : 0,
@@ -339,177 +206,10 @@ class _TodayScreenState extends State<TodayScreen>
                                   child: GestureDetector(
                                     onTap: () {
                                       setState(() {});
+
                                       _isMySelected = !_isMySelected;
                                     },
-                                    child: BackdropFilter(
-                                      filter: ImageFilter.blur(
-                                          sigmaX: 10.0, sigmaY: 10.0),
-                                      child: Container(
-                                        color: Colors.black.withOpacity(0.5),
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        height: 1100.h,
-                                        child: Center(
-                                          child: AnimatedOpacity(
-                                            duration:
-                                                Duration(milliseconds: 700),
-                                            opacity: _isMySelected ? 1 : 0,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          15.0)),
-                                              width: 654.w,
-                                              height: 654.h,
-                                              child: Card(
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              36.r)),
-                                                  child: Padding(
-                                                    padding: EdgeInsets.only(
-                                                        left: 64.w,
-                                                        top: 80.h,
-                                                        right: 64.w),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Row(
-                                                          children: [
-                                                            const CircleAvatar(
-                                                              child: null,
-                                                            ),
-                                                            SizedBox(
-                                                                width: 15.w),
-                                                            Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(''),
-                                                                Text(''),
-                                                              ],
-                                                            )
-                                                          ],
-                                                        ),
-                                                        SizedBox(height: 20.h),
-                                                        Container(
-                                                          height: 320.h,
-                                                          child: Text('',
-                                                              maxLines: 8,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 20.h,
-                                                        ),
-                                                        Container(
-                                                            width:
-                                                                MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                            child: Text(
-                                                                '${formattedNow}'),
-                                                            decoration:
-                                                                const BoxDecoration(
-                                                              border: Border(
-                                                                  bottom: BorderSide(
-                                                                      color: Colors
-                                                                          .black)),
-                                                            )),
-                                                        SizedBox(
-                                                          height: 12.h,
-                                                        ),
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .end,
-                                                          children: [
-                                                            Container(
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Colors
-                                                                    .white,
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                border: Border.all(
-                                                                    color: Colors
-                                                                        .black),
-                                                              ),
-                                                              width: 50.w,
-                                                              height: 50.h,
-                                                              child: const Center(
-                                                                  child: Icon(
-                                                                Icons
-                                                                    .share_outlined,
-                                                                size: 20,
-                                                              )
-                                                                  // child: Image.asset(
-                                                                  //     'assets/images/share_icon.png'),
-                                                                  ),
-                                                            ),
-                                                            SizedBox(
-                                                              width: 11.w,
-                                                            ),
-                                                            Container(
-                                                              decoration: BoxDecoration(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  shape: BoxShape
-                                                                      .circle,
-                                                                  border: Border.all(
-                                                                      color: Colors
-                                                                          .black)),
-                                                              width: 50.w,
-                                                              height: 50.h,
-                                                              child: const Center(
-                                                                  child: Icon(
-                                                                Icons
-                                                                    .file_download_outlined,
-                                                                size: 20,
-                                                              )
-                                                                  //     'assets/images/save_icon.png'),
-                                                                  ),
-                                                            ),
-                                                            SizedBox(
-                                                              width: 12.w,
-                                                            ),
-                                                            Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  shape: BoxShape
-                                                                      .circle,
-                                                                  border: Border.all(
-                                                                      color: Colors
-                                                                          .black),
-                                                                ),
-                                                                width: 50.w,
-                                                                height: 50.h,
-                                                                child:
-                                                                    const Center(
-                                                                  child: Icon(
-                                                                    Icons
-                                                                        .bookmark_border_outlined,
-                                                                    size: 20,
-                                                                  ),
-                                                                )),
-                                                          ],
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  color: Colors.white),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                    child: EnlargedMyCard(_myselectedPost),
                                   )),
                             ),
                           )
@@ -520,6 +220,278 @@ class _TodayScreenState extends State<TodayScreen>
                 ),
               )
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Container MyCard(String postId, AppData appData) {
+    return Container(
+      color: kBackgroundColor,
+      child: Padding(
+        padding: EdgeInsets.all(30.0.r),
+        child: StreamBuilder<DocumentSnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('post')
+                .doc(postId)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.data!.data() == null) {
+                // print('null data');
+                return Center(
+                  child: Text('오늘은 명언이 없습니다.'),
+                );
+              }
+              return AnimationLimiter(
+                child: GridView.builder(
+                    itemCount: appData.savedPost.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2),
+                    itemBuilder: (context, index) {
+                      Post post = Post(
+                          title: (snapshot.data!.data()
+                              as Map<String, dynamic>)['title'],
+                          subtitle: (snapshot.data!.data()
+                              as Map<String, dynamic>)['subtitle'],
+                          content: (snapshot.data!.data()
+                              as Map<String, dynamic>)['content']);
+
+                      return AnimationConfiguration.staggeredGrid(
+                        position: index,
+                        columnCount: 2,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {});
+                            _myselectedPost = post;
+                            _isMySelected = !_isMySelected;
+                          },
+                          child: ScaleAnimation(
+                            duration: Duration(milliseconds: 500),
+                            child: Container(
+                              height: 313.h,
+                              width: 313.w,
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(36.r)),
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                      left: 20.w, top: 20.h, right: 20.w),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 70.h,
+                                      ),
+                                      Row(
+                                        children: [
+                                          const CircleAvatar(
+                                            child: Icon(Icons.person),
+                                            radius: 15,
+                                          ),
+                                          SizedBox(width: 15.w),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    post.title.toString(),
+                                                    style: TextStyle(
+                                                        fontSize: 18.sp,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  Icon(
+                                                    Icons
+                                                        .star_border_purple500_outlined,
+                                                    size: 15,
+                                                  )
+                                                ],
+                                              ),
+                                              Text(
+                                                post.subtitle.toString(),
+                                                style: TextStyle(
+                                                    fontSize: 18.sp,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 22.h),
+                                      Flexible(
+                                        child: Container(
+                                          width: 220.w,
+                                          height: 125.h,
+                                          child: Text(
+                                            post.content.toString(),
+                                            style: TextStyle(fontSize: 20.sp),
+                                            maxLines: 3,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+              );
+            }),
+      ),
+    );
+  }
+
+  Widget EnlargedMyCard(Post? post) {
+    if (post == null) return Container();
+    return BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+      child: Container(
+        color: Colors.black.withOpacity(0.5),
+        width: MediaQuery.of(context).size.width,
+        height: 1100.h,
+        child: Center(
+          child: AnimatedOpacity(
+            duration: Duration(milliseconds: 700),
+            opacity: _isMySelected ? 1 : 0,
+            child: Container(
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(15.0)),
+              width: 654.w,
+              height: 654.h,
+              child: Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(36.r)),
+                  child: Padding(
+                    padding:
+                        EdgeInsets.only(left: 64.w, top: 80.h, right: 64.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const CircleAvatar(
+                              child: null,
+                            ),
+                            SizedBox(width: 15.w),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  post.title.toString(),
+                                  style: GoogleFonts.notoSans(
+                                      fontSize: 23.sp,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: -1.w,
+                                      wordSpacing: 34.h),
+                                ),
+                                Text(
+                                  post.subtitle.toString(),
+                                  style: GoogleFonts.notoSans(
+                                      fontSize: 20.sp,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: -1.w,
+                                      wordSpacing: 34.h),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                        SizedBox(height: 20.h),
+                        Container(
+                          height: 320.h,
+                          child: Text(post.content.toString(),
+                              style: GoogleFonts.notoSans(
+                                  fontSize: 25.sp,
+                                  letterSpacing: -1.h,
+                                  wordSpacing: 34.sp),
+                              maxLines: 8,
+                              overflow: TextOverflow.ellipsis),
+                        ),
+                        SizedBox(
+                          height: 20.h,
+                        ),
+                        Container(
+                            width: MediaQuery.of(context).size.width,
+                            child: Text('${formattedNow}'),
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(color: Color(0xFF777777))),
+                            )),
+                        SizedBox(
+                          height: 12.h,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Color(0xFF707070)),
+                              ),
+                              width: 50.w,
+                              height: 50.h,
+                              child: const Center(
+                                  child: Icon(
+                                Icons.share_outlined,
+                                size: 20,
+                              )
+                                  // child: Image.asset(
+                                  //     'assets/images/share_icon.png'),
+                                  ),
+                            ),
+                            SizedBox(
+                              width: 11.w,
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Color(0xFF707070))),
+                              width: 50.w,
+                              height: 50.h,
+                              child: const Center(
+                                  child: Icon(
+                                Icons.file_download_outlined,
+                                size: 20,
+                              )
+                                  //     'assets/images/save_icon.png'),
+                                  ),
+                            ),
+                            SizedBox(
+                              width: 12.w,
+                            ),
+                            Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Color(0xFF707070)),
+                                ),
+                                width: 50.w,
+                                height: 50.h,
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.bookmark_border_outlined,
+                                    size: 20,
+                                  ),
+                                )),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                  color: Colors.white),
+            ),
           ),
         ),
       ),
@@ -742,7 +714,7 @@ class _TodayScreenState extends State<TodayScreen>
             if (snapshot.data?.data() == null) {
               // print('null data');
               return Center(
-                child: Text('데이터가 없습니다.'),
+                child: Text('오늘은 명언이 없습니다.'),
               );
             }
 
@@ -773,8 +745,23 @@ class _TodayScreenState extends State<TodayScreen>
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(title),
-                                Text(subtitle),
+                                Text(
+                                  title,
+                                  style: GoogleFonts.notoSans(
+                                      fontSize: 23.sp,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: -1.w,
+                                      wordSpacing: 34.h),
+                                ),
+                                SizedBox(height: 6.h),
+                                Text(
+                                  subtitle,
+                                  style: GoogleFonts.notoSans(
+                                      fontSize: 20.sp,
+                                      fontWeight: FontWeight.normal,
+                                      letterSpacing: -1.w,
+                                      wordSpacing: 34.h),
+                                ),
                               ],
                             )
                           ],
@@ -782,18 +769,29 @@ class _TodayScreenState extends State<TodayScreen>
                         SizedBox(height: 20.h),
                         Container(
                           height: 320.h,
+                          width: 356.w,
                           child: Text(content,
-                              maxLines: 8, overflow: TextOverflow.ellipsis),
+                              style: GoogleFonts.notoSans(
+                                  fontSize: 25.sp,
+                                  letterSpacing: -1.h,
+                                  wordSpacing: 34.sp),
+                              maxLines: 8,
+                              overflow: TextOverflow.ellipsis),
                         ),
                         SizedBox(
                           height: 20.h,
                         ),
                         Container(
                             width: MediaQuery.of(context).size.width,
-                            child: Text('${formattedNow}'),
+                            child: Text(
+                              '${formattedNow}',
+                              style: GoogleFonts.notoSans(
+                                fontSize: 25.sp,
+                              ),
+                            ),
                             decoration: const BoxDecoration(
                               border: Border(
-                                  bottom: BorderSide(color: Colors.black)),
+                                  bottom: BorderSide(color: Color(0xFF777777))),
                             )),
                         SizedBox(
                           height: 12.h,
@@ -805,7 +803,7 @@ class _TodayScreenState extends State<TodayScreen>
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.black),
+                                border: Border.all(color: Color(0xFF707070)),
                               ),
                               width: 55.w,
                               height: 55.h,
@@ -827,7 +825,7 @@ class _TodayScreenState extends State<TodayScreen>
                               decoration: BoxDecoration(
                                   color: Colors.white,
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.black)),
+                                  border: Border.all(color: Color(0xFF707070))),
                               width: 55.w,
                               height: 55.h,
                               child: Center(
@@ -851,7 +849,7 @@ class _TodayScreenState extends State<TodayScreen>
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.black),
+                                border: Border.all(color: Color(0xFF707070)),
                               ),
                               width: 55.w,
                               height: 55.h,
@@ -902,113 +900,148 @@ class _TodayScreenState extends State<TodayScreen>
                   BoxDecoration(borderRadius: BorderRadius.circular(15.0)),
               width: 654.w,
               height: 654.h,
-              child: Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(36.r)),
-                  child: Padding(
-                    padding:
-                        EdgeInsets.only(left: 64.w, top: 80.h, right: 64.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const CircleAvatar(
-                              child: Icon(Icons.person),
-                            ),
-                            SizedBox(width: 15.w),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(post.title.toString()),
-                                Text(post.subtitle.toString()),
-                              ],
-                            )
-                          ],
-                        ),
-                        SizedBox(height: 20.h),
-                        Container(
-                          height: 320.h,
-                          child: Text(post.content.toString(),
-                              maxLines: 8, overflow: TextOverflow.ellipsis),
-                        ),
-                        SizedBox(
-                          height: 20.h,
-                        ),
-                        Container(
-                            width: MediaQuery.of(context).size.width,
-                            child: Text('${formattedNow}'),
-                            decoration: const BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(color: Colors.black)),
-                            )),
-                        SizedBox(
-                          height: 12.h,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.black),
+              child: Screenshot(
+                controller: _screenshotController,
+                child: Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(36.r)),
+                    child: Padding(
+                      padding:
+                          EdgeInsets.only(left: 64.w, top: 80.h, right: 64.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const CircleAvatar(
+                                child: Icon(Icons.person),
                               ),
-                              width: 55.w,
-                              height: 55.h,
-                              child: Center(
-                                  child: IconButton(
-                                      padding: EdgeInsets.zero,
-                                      onPressed: () async {
-                                        await Share.share(
-                                            'title : ${post.title}\nsubtitle : ${post.subtitle}\ncontent : ${post.content}');
-                                      },
-                                      icon: Icon(Icons.share_outlined))
-                                  // child: Image.asset(
-                                  //     'assets/images/share_icon.png'),
+                              SizedBox(width: 15.w),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    post.title.toString(),
+                                    style: GoogleFonts.notoSans(
+                                        fontSize: 23.sp,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: -1.w,
+                                        wordSpacing: 34.h),
                                   ),
-                            ),
-                            SizedBox(
-                              width: 11.w,
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.black)),
-                              width: 55.w,
-                              height: 55.h,
-                              child: Center(
-                                  child: IconButton(
-                                      padding: EdgeInsets.zero,
-                                      onPressed: () {},
-                                      icon: Icon(Icons.file_download_outlined))
-                                  //     'assets/images/save_icon.png'),
+                                  Text(
+                                    post.subtitle.toString(),
+                                    style: GoogleFonts.notoSans(
+                                        fontSize: 20.sp,
+                                        fontWeight: FontWeight.normal,
+                                        letterSpacing: -1.w,
+                                        wordSpacing: 34.h),
                                   ),
-                            ),
-                            SizedBox(
-                              width: 12.w,
-                            ),
-                            Container(
+                                ],
+                              )
+                            ],
+                          ),
+                          SizedBox(height: 20.h),
+                          Container(
+                            height: 320.h,
+                            width: 356.w,
+                            child: Text(post.content.toString(),
+                                style: GoogleFonts.notoSans(
+                                    fontSize: 25.sp,
+                                    letterSpacing: -1.h,
+                                    wordSpacing: 34.sp),
+                                maxLines: 8,
+                                overflow: TextOverflow.ellipsis),
+                          ),
+                          SizedBox(
+                            height: 20.h,
+                          ),
+                          Container(
+                              width: MediaQuery.of(context).size.width,
+                              child: Text('${formattedNow}'),
+                              decoration: const BoxDecoration(
+                                border: Border(
+                                    bottom:
+                                        BorderSide(color: Color(0xFF777777))),
+                              )),
+                          SizedBox(
+                            height: 12.h,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.black),
+                                  border: Border.all(color: Color(0xFF707070)),
                                 ),
                                 width: 55.w,
                                 height: 55.h,
                                 child: Center(
                                     child: IconButton(
                                         padding: EdgeInsets.zero,
-                                        onPressed: () {},
-                                        icon: Icon(
-                                            Icons.bookmark_border_outlined)))),
-                          ],
-                        )
-                      ],
+                                        onPressed: () async {
+                                          final imageSave =
+                                              await _screenshotController
+                                                  .capture();
+                                          saveAndShare(imageSave);
+                                        },
+                                        icon: Icon(Icons.share_outlined))
+                                    // child: Image.asset(
+                                    //     'assets/images/share_icon.png'),
+                                    ),
+                              ),
+                              SizedBox(
+                                width: 11.w,
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    border:
+                                        Border.all(color: Color(0xFF707070))),
+                                width: 55.w,
+                                height: 55.h,
+                                child: Center(
+                                    child: IconButton(
+                                        padding: EdgeInsets.zero,
+                                        onPressed: () async {
+                                          final imageSave =
+                                              await _screenshotController
+                                                  .capture();
+                                          if (imageSave == null) {}
+                                          await saveImage(imageSave);
+                                        },
+                                        icon:
+                                            Icon(Icons.file_download_outlined))
+                                    //     'assets/images/save_icon.png'),
+                                    ),
+                              ),
+                              SizedBox(
+                                width: 12.w,
+                              ),
+                              Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    border:
+                                        Border.all(color: Color(0xFF707070)),
+                                  ),
+                                  width: 55.w,
+                                  height: 55.h,
+                                  child: Center(
+                                      child: IconButton(
+                                          padding: EdgeInsets.zero,
+                                          onPressed: () {},
+                                          icon: Icon(Icons
+                                              .bookmark_border_outlined)))),
+                            ],
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                  color: Colors.white),
+                    color: Colors.white),
+              ),
             ),
           ),
         ),
@@ -1076,16 +1109,39 @@ class _TodayScreenState extends State<TodayScreen>
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(title),
-                                    Text(subtitle),
+                                    Text(
+                                      title,
+                                      style: GoogleFonts.notoSans(
+                                          fontSize: 23.sp,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: -1.w,
+                                          wordSpacing: 34.h),
+                                    ),
+                                    SizedBox(
+                                      height: 6.h,
+                                    ),
+                                    Text(
+                                      subtitle,
+                                      style: GoogleFonts.notoSans(
+                                          fontSize: 20.sp,
+                                          fontWeight: FontWeight.normal,
+                                          letterSpacing: -1.w,
+                                          wordSpacing: 34.h),
+                                    ),
                                   ],
                                 )
                               ],
                             ),
                             SizedBox(height: 22.h),
                             Container(
+                              width: 356.w,
+                              height: 320.h,
                               child: Text(
                                 content,
+                                style: GoogleFonts.notoSans(
+                                    fontSize: 25.sp,
+                                    letterSpacing: -1.h,
+                                    wordSpacing: 34.sp),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 8,
                               ),
@@ -1293,7 +1349,10 @@ class ExitApp extends StatelessWidget {
                               border: Border(
                                   top: BorderSide(color: Color(0xFF777777)))),
                           child: TextButton(
-                              onPressed: () {}, child: const Text('종료')),
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                              },
+                              child: const Text('종료')),
                         ),
                       ),
                     ],

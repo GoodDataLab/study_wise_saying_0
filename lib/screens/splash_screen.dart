@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:intl/intl.dart';
 
 import 'onboading_screen.dart';
@@ -54,8 +55,9 @@ class _SplashScreenState extends State<SplashScreen> {
     SharedPreferences instance = await SharedPreferences.getInstance();
     String? goal = instance.getString('goal');
     int? dDay = instance.getInt('dDay');
-    String? now = DateFormat('yyyy-MM-dd 00:00:00.000')
-        .format(DateTime.now()); //instance.getString('now');
+    String? now =
+        instance.getString('now'); //DateFormat('yyyy-MM-dd 00:00:00.000')
+    //.format(DateTime.now());
     String? selectedDay = instance.getString('selectedDate');
 
     if (goal == null) {
@@ -66,7 +68,6 @@ class _SplashScreenState extends State<SplashScreen> {
     }
 
     if (dDay == null) {
-      print(dDay);
       // do nothing
     } else {
       AppData appData = Get.find();
