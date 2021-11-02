@@ -24,7 +24,8 @@ class _AdminScreenState extends State<AdminScreen> {
       DateRangePickerController();
 
   String _date = DateFormat('yyyy MMMM dd').format(DateTime.now()).toString();
-  //Post? post;
+
+  //var _flutterLocalNotificationsPlugin;
 
   @override
   void initState() {
@@ -167,8 +168,8 @@ class _AdminScreenState extends State<AdminScreen> {
                                         id: _adiminDateRangeController
                                             .selectedDate
                                             .toString(),
-                                        dateCreated: _adiminDateRangeController
-                                            .selectedDate,
+                                        // dateCreated: _adiminDateRangeController
+                                        //     .selectedDate,
                                         title: titleController.text,
                                         subtitle: subtitleController.text,
                                         content: contentController.text);
@@ -184,6 +185,7 @@ class _AdminScreenState extends State<AdminScreen> {
                                         postSubtitle: subtitleController.text,
                                         postContent: contentController.text);
                                   }
+
                                   Get.back();
                                 },
                                 child: Text('작성하기'))),

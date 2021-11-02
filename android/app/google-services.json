@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "21234871773",
+    "project_id": "study-wisesaying",
+    "storage_bucket": "study-wisesaying.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:21234871773:android:2b8d48f5339649e00c1a34",
+        "android_client_info": {
+          "package_name": "com.gooddatalab.studyWiseSaying"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "21234871773-f34qpmid1vfa4fc2dm8jcm1v08pp2o4u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_9PCOsCEA-sZmRRk-8fI_BaBINMEllcU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "21234871773-f34qpmid1vfa4fc2dm8jcm1v08pp2o4u.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "21234871773-v53333ehg1imrqt3pki35rtg0ub2un5k.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gooddatalab.studyWiseSaying"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

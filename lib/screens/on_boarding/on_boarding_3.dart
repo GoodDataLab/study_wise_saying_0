@@ -25,7 +25,7 @@ class _OnBoarding3State extends State<OnBoarding3> {
                     height: 374.h,
                   ),
                   SizedBox(
-                    height: 80.h,
+                    height: 87.h,
                     child: FadeIn(
                       duration: Duration(seconds: 3),
                       child: Text(
@@ -33,39 +33,40 @@ class _OnBoarding3State extends State<OnBoarding3> {
                         style: TextStyle(
                             fontSize: 60.sp,
                             fontWeight: FontWeight.bold,
-                            wordSpacing: -7.5.w,
+                            letterSpacing: -4.5.sp,
                             height: 1.0),
                       ),
                     ),
                   ),
                   SizedBox(
-                    width: 590.w,
-                    height: 50.h,
+                    width: 405.w,
+                    height: 91.h,
                     child: FadeIn(
                       duration: Duration(seconds: 3),
                       child: Text(
-                        '디데이를 설정하여',
+                        '디데이를 설정하여\n공명으로 목표를 달성해보세요.',
                         style: TextStyle(
                           fontSize: 35.sp,
-                          wordSpacing: -7.5.w,
+                          letterSpacing: -2.63.sp,
+                          height: 1.1,
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 590.w,
-                    height: 50.h,
-                    child: FadeIn(
-                      duration: Duration(seconds: 3),
-                      child: Text(
-                        '공명으로 목표를 달성해보세요.',
-                        style: TextStyle(
-                          fontSize: 35.sp,
-                          wordSpacing: -7.5.w,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // SizedBox(
+                  //   width: 590.w,
+                  //   height: 50.h,
+                  //   child: FadeIn(
+                  //     duration: Duration(seconds: 3),
+                  //     child: Text(
+                  //       '공명으로 목표를 달성해보세요.',
+                  //       style: TextStyle(
+                  //         fontSize: 35.sp,
+                  //         wordSpacing: -7.5.w,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   SizedBox(height: 44.h),
                   FadeIn(
                     duration: Duration(seconds: 1),
@@ -84,7 +85,7 @@ class _OnBoarding3State extends State<OnBoarding3> {
                                 offset: Offset(5.0, 5.0)),
                           ],
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(50.r)),
+                          borderRadius: BorderRadius.circular(36.r)),
                       width: 572.w,
                       height: 509.h,
                     ),

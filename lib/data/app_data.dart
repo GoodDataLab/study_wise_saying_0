@@ -11,6 +11,8 @@ class AppData extends GetxController {
   String? currentSelectedDay;
   String? currentNow;
   int? currentDDay;
+  bool isStarted = false;
+  bool isBookMarked = false;
   List<Post> savedPost = [];
   //DateTime? selectedDay;
 

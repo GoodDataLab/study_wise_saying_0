@@ -16,6 +16,10 @@ class DatabaseController {
     return FirebaseFirestore.instance.collection('post').doc(postId).get();
   }
 
+  Future<void> deletePost({required String postId}) async {
+    return FirebaseFirestore.instance.collection('post').doc(postId).delete();
+  }
+
   Future<void> updatePost(
       {required String postId,
       required String postTitle,

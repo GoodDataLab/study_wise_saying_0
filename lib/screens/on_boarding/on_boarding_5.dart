@@ -8,6 +8,8 @@ class OnBoarding5 extends StatefulWidget {
 }
 
 class _OnBoarding5State extends State<OnBoarding5> {
+  var _flutterLocalNotificationsPlugin;
+
   AppData appData = Get.find();
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,7 @@ class _OnBoarding5State extends State<OnBoarding5> {
                     height: 374.h,
                   ),
                   SizedBox(
-                    height: 80.h,
+                    height: 87.h,
                     child: FadeIn(
                       duration: Duration(seconds: 3),
                       child: Text(
@@ -35,39 +37,40 @@ class _OnBoarding5State extends State<OnBoarding5> {
                         style: TextStyle(
                             fontSize: 60.sp,
                             fontWeight: FontWeight.bold,
-                            wordSpacing: -7.5.w,
+                            letterSpacing: -4.5.sp,
                             height: 1.0),
                       ),
                     ),
                   ),
                   SizedBox(
                     width: 590.w,
-                    height: 50.h,
+                    height: 91.h,
                     child: FadeIn(
                       duration: Duration(seconds: 3),
                       child: Text(
-                        '우측하단에 북마크를 활용하여',
+                        '우측하단에 북마크를 활용하여\n나의 공명을 만들어보세요',
                         style: TextStyle(
                           fontSize: 35.sp,
-                          wordSpacing: -7.5.w,
+                          letterSpacing: -2.63.sp,
+                          height: 1.1,
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 590.w,
-                    height: 50.h,
-                    child: FadeIn(
-                      duration: Duration(seconds: 3),
-                      child: Text(
-                        '나의 공명을 만들어보세요',
-                        style: TextStyle(
-                          fontSize: 35.sp,
-                          wordSpacing: -7.5.w,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // SizedBox(
+                  //   width: 590.w,
+                  //   height: 50.h,
+                  //   child: FadeIn(
+                  //     duration: Duration(seconds: 3),
+                  //     child: Text(
+                  //       '나의 공명을 만들어보세요',
+                  //       style: TextStyle(
+                  //         fontSize: 35.sp,
+                  //         wordSpacing: -7.5.w,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   SizedBox(height: 44.h),
                   FadeIn(
                     duration: Duration(seconds: 1),
@@ -86,12 +89,12 @@ class _OnBoarding5State extends State<OnBoarding5> {
                                 offset: Offset(5.0, 5.0)),
                           ],
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(50.r)),
+                          borderRadius: BorderRadius.circular(36.r)),
                       width: 572.w,
                       height: 509.h,
                     ),
                   ),
-                  SizedBox(height: 185.h),
+                  SizedBox(height: 195.h),
                   FadeIn(
                     duration: Duration(seconds: 2),
                     child: Container(
@@ -105,7 +108,12 @@ class _OnBoarding5State extends State<OnBoarding5> {
                             offset: Offset(5.0, 5.0)),
                       ], borderRadius: BorderRadius.circular(60.r)),
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          setState(() {});
+                          appData.isStarted = true;
+                          SharedPreferences _prefs =
+                              await SharedPreferences.getInstance();
+                          _prefs.setBool('isStarted', true);
                           Get.to(() => TodayScreen());
                         },
                         child: Text(
@@ -113,7 +121,7 @@ class _OnBoarding5State extends State<OnBoarding5> {
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 30.sp,
-                              wordSpacing: -2.1.w),
+                              wordSpacing: -2.1.sp),
                         ),
                         style: ButtonStyle(
                             shape: MaterialStateProperty.all<

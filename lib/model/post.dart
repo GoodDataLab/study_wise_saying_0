@@ -3,27 +3,30 @@ class Post {
   String? title;
   String? content;
   String? subtitle;
-  DateTime? dateCreated;
+  //DateTime? dateCreated;
 
   Post({
     this.title,
     this.subtitle,
     this.content,
-    this.dateCreated,
+    //this.dateCreated,
     this.id,
   });
+
+  //String toStrint() => id! + "/" + title! + "/" + content! + '/' + subtitle!;
+
   Post.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         title = json['title'],
         content = json['content'],
-        subtitle = json['subtitle'],
-        dateCreated = json['dateCreated'].toDate();
+        subtitle = json['subtitle'];
+  // dateCreated = json['dateCreated'].toDate();
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'title': title,
         'content': content,
         'subtitle': subtitle,
-        'dateCreated': dateCreated,
+        // 'dateCreated': dateCreated,
       };
 }

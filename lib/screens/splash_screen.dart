@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:intl/intl.dart';
+import 'package:study_wise_saying/controllers/nofitication_service.dart';
+import 'package:study_wise_saying/model/post.dart';
 
 import 'onboading_screen.dart';
 import 'package:show_up_animation/show_up_animation.dart';
@@ -16,11 +18,21 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  //late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
+
   @override
   void initState() {
+    super.initState();
+
+    NotificationService().requestIOSPermissions();
+    //NotificationService().everyAtTimeNotification();
+    NotificationService().ScheduleTimeNotification();
+
     _getLocalData();
-    Future.delayed(Duration(milliseconds: 5000))
-        .then((value) => Get.off(() => OnBoardingScreen()));
+
+    Future.delayed(Duration(milliseconds: 5000)).then((value) =>
+        Get.off(() => appData.isStarted ? TodayScreen() : OnBoardingScreen()));
+    super.initState();
   }
 
   AppData appData = Get.find();
@@ -52,20 +64,50 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _getLocalData() async {
+    AppData appData = Get.find();
     SharedPreferences instance = await SharedPreferences.getInstance();
+
     String? goal = instance.getString('goal');
     int? dDay = instance.getInt('dDay');
-    String? now =
-        instance.getString('now'); //DateFormat('yyyy-MM-dd 00:00:00.000')
-    //.format(DateTime.now());
-    String? selectedDay = instance.getString('selectedDate');
+    String selectedDate =
+        instance.getString('selectedDate') ?? appData.currentNow!;
+
+    String? now = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    bool isStarted = instance.getBool('isStarted') ?? false;
+    bool myPostId = instance.getBool('myPostId') ?? false;
+
+    //print(now);
 
     if (goal == null) {
+      //print('ssss');
       // do nothing
     } else {
       AppData appData = Get.find();
       appData.currentGoal = goal;
+      //print('aaaaa');
     }
+
+    if (isStarted == false) {
+      //do notjing
+    } else {
+      AppData appData = Get.find();
+      appData.isStarted = isStarted;
+    }
+
+    if (myPostId == false) {
+      //do noting
+    } else {
+      AppData appData = Get.find();
+      appData.isBookMarked = myPostId;
+    }
+    // if (postMyId == null) {
+    //   //do notiing
+    // } else {
+    //   AppData appData=Get.find();
+    //   appData.savedPost.id = postMyId;
+
+    // }
 
     if (dDay == null) {
       // do nothing
@@ -75,19 +117,17 @@ class _SplashScreenState extends State<SplashScreen> {
       print(dDay);
     }
 
-    if (now == null) {
-      //do noting
-    } else {
-      AppData appData = Get.find();
-      appData.currentNow = now;
-      print(now);
-    }
+    //AppData appData = Get.find();
+    appData.currentNow = now;
+    print(now);
 
-    if (selectedDay == null) {
+    if (selectedDate == null) {
+      AppData appData = Get.find();
+      appData.currentSelectedDay = appData.currentNow;
     } else {
       AppData appData = Get.find();
-      appData.currentSelectedDay = selectedDay;
-      print(selectedDay);
+      appData.currentSelectedDay = selectedDate;
+      print(selectedDate);
     }
   }
 }

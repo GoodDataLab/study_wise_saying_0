@@ -10,9 +10,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 //import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
@@ -33,7 +35,7 @@ class TodayScreen extends StatefulWidget {
 }
 
 class _TodayScreenState extends State<TodayScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   AppData appData = Get.find();
 
   bool administrator = true;
@@ -47,9 +49,12 @@ class _TodayScreenState extends State<TodayScreen>
   DateRangePickerController _dateRangePickerController =
       DateRangePickerController();
   ScreenshotController _screenshotController = ScreenshotController();
+  ScreenshotController _lastScreenshotController = ScreenshotController();
 
+  String date = DateFormat('yyyy-MM-dd').format(DateTime.now()).toString();
   DateTime now = DateTime.now();
-  String formattedNow = DateFormat.jm().add_yMMMd().format(DateTime.now());
+  DateTime lastMonth = DateTime.now().subtract(Duration(days: 30));
+
   DateTime? selectedDay;
   int? diff;
   Post? _selectedPost;
@@ -57,12 +62,16 @@ class _TodayScreenState extends State<TodayScreen>
 
   final Stream<QuerySnapshot>? _postStream = FirebaseFirestore.instance
       .collection('post')
-      .orderBy('dateCreated', descending: true)
+      .orderBy('id', descending: true)
       .snapshots();
 
   @override
   void initState() {
+    _dateRangePickerController.displayDate =
+        DateTime.tryParse(appData.currentSelectedDay.toString());
+
     _tabController = TabController(length: 3, vsync: this);
+
     String initGoal = appData.currentGoal ?? '';
     _goalEditingController = TextEditingController(text: initGoal);
 
@@ -73,15 +82,14 @@ class _TodayScreenState extends State<TodayScreen>
 
   @override
   void dispose() {
-    _tabController?.dispose();
+    _tabController!.dispose();
     _goalEditingController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    String postId =
-        DateFormat('yyyy-MM-dd 00:00:00.000').format(DateTime.now());
+    String postId = DateFormat('yyyy-MM-dd').format(DateTime.now());
     return GetBuilder(
       builder: (AppData appData) => WillPopScope(
         onWillPop: () {
@@ -94,6 +102,7 @@ class _TodayScreenState extends State<TodayScreen>
           return Future(() => false);
         },
         child: Scaffold(
+          resizeToAvoidBottomInset: false,
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(40.0.h),
             child: AppBar(
@@ -136,6 +145,7 @@ class _TodayScreenState extends State<TodayScreen>
                             child: GestureDetector(
                               onTap: () async {
                                 await ShowCalendar(context, appData);
+                                // await _showNotification();
                               },
                               child: SizedBox(
                                   width: 25.w,
@@ -161,7 +171,7 @@ class _TodayScreenState extends State<TodayScreen>
                           SizedBox(height: 150.h),
                           // 오늘 공명
                           TodayCard(),
-                          SizedBox(height: 34.h),
+                          // SizedBox(height: 34.h),
                         ],
                       ),
                     ),
@@ -170,47 +180,48 @@ class _TodayScreenState extends State<TodayScreen>
                       color: kBackgroundColor,
                       child: Stack(
                         children: [
-                          SwiperCard(appData),
-                          IgnorePointer(
-                            ignoring: !_isSelected,
+                          SwiperCard(),
+                          Positioned(
+                            bottom: 0.0.h,
                             child: AnimatedOpacity(
                               duration: Duration(milliseconds: 100),
                               opacity: _isSelected ? 1 : 0,
-                              child: Positioned(
-                                  bottom: 0.0.h,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {});
-                                      _isSelected = !_isSelected;
-                                    },
-                                    child: EnlargeLastCard(_selectedPost),
-                                  )),
+                              child: IgnorePointer(
+                                ignoring: !_isSelected,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {});
+                                    _isSelected = !_isSelected;
+                                  },
+                                  child: EnlargeLastCard(_selectedPost),
+                                ),
+                              ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
                     // 나의 공명
                     Container(
-                      color: kBackgroundColor,
                       child: Stack(
                         children: [
                           MyCard(postId, appData),
-                          AnimatedOpacity(
-                            duration: Duration(milliseconds: 200),
-                            opacity: _isMySelected ? 1 : 0,
+                          Positioned(
+                            bottom: 0.0.h,
                             child: IgnorePointer(
                               ignoring: !_isMySelected,
-                              child: Positioned(
-                                  bottom: 0.h,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {});
+                              child: AnimatedOpacity(
+                                duration: Duration(milliseconds: 200),
+                                opacity: _isMySelected ? 1 : 0,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {});
 
-                                      _isMySelected = !_isMySelected;
-                                    },
-                                    child: EnlargedMyCard(_myselectedPost),
-                                  )),
+                                    _isMySelected = !_isMySelected;
+                                  },
+                                  child: EnlargedMyCard(_myselectedPost),
+                                ),
+                              ),
                             ),
                           )
                         ],
@@ -237,12 +248,46 @@ class _TodayScreenState extends State<TodayScreen>
                 .doc(postId)
                 .snapshots(),
             builder: (context, snapshot) {
-              if (snapshot.data!.data() == null) {
-                // print('null data');
+              if (appData.savedPost.length == 0) {
                 return Center(
-                  child: Text('오늘은 명언이 없습니다.'),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 380.h,
+                      ),
+                      Container(
+                        height: 80.h,
+                        width: 494.w,
+                        child: Text('나의 공명을 채워주세요!',
+                            style: GoogleFonts.notoSans(
+                              fontSize: 55.sp,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -5.sp,
+                            )),
+                      ),
+                      Container(
+                        height: 55.3.h,
+                        child: Text('간직하고픈 공부명언을 스크랩하여',
+                            style: GoogleFonts.notoSans(
+                              fontSize: 40.sp,
+                              fontWeight: FontWeight.normal,
+                              letterSpacing: -5.sp,
+                            )),
+                      ),
+                      Container(
+                        height: 55.3.h,
+                        child: Text('울림이 있는 나의 공명을 채워보세요.',
+                            style: GoogleFonts.notoSans(
+                              fontSize: 40.sp,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: -5.sp,
+                            )),
+                      )
+                    ],
+                  ),
                 );
               }
+
               return AnimationLimiter(
                 child: GridView.builder(
                     itemCount: appData.savedPost.length,
@@ -251,12 +296,17 @@ class _TodayScreenState extends State<TodayScreen>
                             crossAxisCount: 2),
                     itemBuilder: (context, index) {
                       Post post = Post(
-                          title: (snapshot.data!.data()
-                              as Map<String, dynamic>)['title'],
-                          subtitle: (snapshot.data!.data()
-                              as Map<String, dynamic>)['subtitle'],
-                          content: (snapshot.data!.data()
-                              as Map<String, dynamic>)['content']);
+                        title: (snapshot.data!.data()
+                            as Map<String, dynamic>)['title'],
+
+                        subtitle: (snapshot.data!.data()
+                            as Map<String, dynamic>)['subtitle'],
+
+                        content: (snapshot.data!.data()
+                            as Map<String, dynamic>)['content'],
+                        // id: (snapshot.data?.data()
+                        //     as Map<String, dynamic>)['id'],
+                      );
 
                       return AnimationConfiguration.staggeredGrid(
                         position: index,
@@ -298,18 +348,27 @@ class _TodayScreenState extends State<TodayScreen>
                                             children: [
                                               Row(
                                                 children: [
-                                                  Text(
-                                                    post.title.toString(),
-                                                    style: TextStyle(
-                                                        fontSize: 18.sp,
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                                  Row(
+                                                    children: [
+                                                      Text(
+                                                        post.title.toString(),
+                                                        style: TextStyle(
+                                                            fontSize: 18.sp,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      SizedBox(
+                                                        width: 5.w,
+                                                      ),
+                                                      Container(
+                                                        width: 20.w,
+                                                        height: 20.h,
+                                                        child: Image.asset(
+                                                            'assets/images/pngkit_twitter-png_189183.png'),
+                                                      ),
+                                                    ],
                                                   ),
-                                                  Icon(
-                                                    Icons
-                                                        .star_border_purple500_outlined,
-                                                    size: 15,
-                                                  )
                                                 ],
                                               ),
                                               Text(
@@ -354,7 +413,7 @@ class _TodayScreenState extends State<TodayScreen>
   Widget EnlargedMyCard(Post? post) {
     if (post == null) return Container();
     return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
       child: Container(
         color: Colors.black.withOpacity(0.5),
         width: MediaQuery.of(context).size.width,
@@ -386,13 +445,26 @@ class _TodayScreenState extends State<TodayScreen>
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  post.title.toString(),
-                                  style: GoogleFonts.notoSans(
-                                      fontSize: 23.sp,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: -1.w,
-                                      wordSpacing: 34.h),
+                                Row(
+                                  children: [
+                                    Text(
+                                      post.title.toString(),
+                                      style: GoogleFonts.notoSans(
+                                          fontSize: 23.sp,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: -1.w,
+                                          wordSpacing: 34.h),
+                                    ),
+                                    SizedBox(
+                                      width: 5.w,
+                                    ),
+                                    Container(
+                                      width: 25.w,
+                                      height: 25.h,
+                                      child: Image.asset(
+                                          'assets/images/pngkit_twitter-png_189183.png'),
+                                    ),
+                                  ],
                                 ),
                                 Text(
                                   post.subtitle.toString(),
@@ -422,7 +494,7 @@ class _TodayScreenState extends State<TodayScreen>
                         ),
                         Container(
                             width: MediaQuery.of(context).size.width,
-                            child: Text('${formattedNow}'),
+                            child: Text(DateTime.now().toIso8601String()),
                             decoration: const BoxDecoration(
                               border: Border(
                                   bottom: BorderSide(color: Color(0xFF777777))),
@@ -498,236 +570,234 @@ class _TodayScreenState extends State<TodayScreen>
     );
   }
 
-  ShowCalendar(BuildContext context, AppData appData) async {
+  ShowCalendar(BuildContext context, AppData appData) {
     showDialog(
+        //useSafeArea: true,
         context: context,
         builder: (BuildContext context) {
-          return BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-            child: StatefulBuilder(
-                builder: (BuildContext context, StateSetter stateSetter) {
-              return Center(
-                child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(36.r)),
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter stateSetter) {
+            return Center(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                child: Dialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(36.r)),
+                  child: Container(
                     width: 654.w,
                     height: 1000.h,
                     child: Padding(
                       padding: EdgeInsets.only(top: 15.0.h),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(left: 15.w, top: 35.h),
-                            child: Material(
-                              child: Text('문구수정',
-                                  style: GoogleFonts.notoSans(
-                                      fontSize: 31.sp,
-                                      backgroundColor: Colors.white,
-                                      fontWeight: FontWeight.bold)),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(left: 15.w, top: 35.h),
+                              child: Material(
+                                child: Text('문구수정',
+                                    style: GoogleFonts.notoSans(
+                                        fontSize: 31.sp,
+                                        backgroundColor: Colors.white,
+                                        fontWeight: FontWeight.bold)),
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 5.h),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16.0.w),
-                            child: Material(
-                                child: Container(
-                              color: Colors.white,
-                              child: TextFormField(
-                                maxLength: 12,
-                                decoration: InputDecoration(
-                                    suffixIcon: IconButton(
+                            SizedBox(height: 5.h),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16.0.w),
+                              child: Material(
+                                  child: Container(
+                                color: Colors.white,
+                                child: TextFormField(
+                                  maxLength: 12,
+                                  decoration: InputDecoration(
+                                      suffixIcon: IconButton(
+                                          onPressed: () async {
+                                            setState(() {});
+                                            _goalEditingController!.clear();
+
+                                            SharedPreferences _prefs =
+                                                await SharedPreferences
+                                                    .getInstance();
+                                            _prefs.setString('goal', '');
+                                          },
+                                          icon: Icon(Icons.clear))),
+                                  controller: _goalEditingController,
+                                  onChanged: (value) async {
+                                    setState(() {});
+                                    appData.currentGoal = value;
+                                    SharedPreferences _prefs =
+                                        await SharedPreferences.getInstance();
+                                    _prefs.setString('goal', value);
+                                  },
+                                ),
+                              )),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(left: 15.w),
+                              child: Material(
+                                  child: Text('디데이 설정',
+                                      style: GoogleFonts.notoSans(
+                                        fontSize: 31.sp,
+                                        backgroundColor: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ))),
+                            ),
+                            SizedBox(height: 15.h),
+                            SizedBox(
+                              width: 654.w,
+                              height: 600.h,
+                              child: SfDateRangePicker(
+                                  //showActionButtons: true,
+                                  selectionMode:
+                                      DateRangePickerSelectionMode.single,
+                                  monthViewSettings:
+                                      const DateRangePickerMonthViewSettings(
+                                          dayFormat: 'EEE'),
+                                  toggleDaySelection: true,
+                                  allowViewNavigation: false,
+                                  controller: _dateRangePickerController,
+                                  initialDisplayDate: DateTime.now(),
+                                  initialSelectedDate: DateTime.tryParse(
+                                      appData.currentSelectedDay.toString()),
+                                  onSelectionChanged:
+                                      (DateRangePickerSelectionChangedArgs
+                                          args) {
+                                    SchedulerBinding.instance!
+                                        .addPostFrameCallback(
+                                            (timeStamp) async {
+                                      setState(() {});
+                                      appData.currentSelectedDay =
+                                          DateFormat('yyyy-MM-dd')
+                                              .format(args.value)
+                                              .toString();
+
+                                      SharedPreferences _prefsSelectedDay =
+                                          await SharedPreferences.getInstance();
+                                      _prefsSelectedDay.setString(
+                                          'selectedDate',
+                                          appData.currentSelectedDay
+                                              .toString());
+                                      print(appData.currentSelectedDay
+                                          .toString());
+                                    });
+                                  }),
+                            ),
+                            SizedBox(height: 12.h),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                        border: Border(
+                                            top: BorderSide(
+                                                color: Color(0xFF777777)),
+                                            right: BorderSide(
+                                                color: Color(0xFF777777)))),
+                                    child: TextButton(
+                                        onPressed: () {
+                                          setState(() {});
+                                          _dateRangePickerController
+                                              .displayDate = DateTime.now();
+                                        },
+                                        child: const Text(
+                                          '오늘 날짜로',
+                                        )),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                        border: Border(
+                                            top: BorderSide(
+                                                color: Color(0xFF777777)))),
+                                    child: TextButton(
                                         onPressed: () async {
                                           setState(() {});
-                                          _goalEditingController!.clear();
+                                          DateTime currentDay = DateTime(
+                                              now.year, now.month, now.day);
 
-                                          SharedPreferences _prefs =
+                                          appData.currentNow =
+                                              DateFormat('yyyy-MM-dd ')
+                                                  .format(DateTime.now());
+
+                                          appData.currentDDay =
+                                              _dateRangePickerController
+                                                  .selectedDate!
+                                                  .difference(currentDay)
+                                                  .inDays;
+
+                                          print(appData.currentNow);
+                                          print(appData.currentDDay);
+
+                                          SharedPreferences _prefsDDay =
                                               await SharedPreferences
                                                   .getInstance();
-                                          _prefs.setString('goal', '');
+                                          _prefsDDay.setInt(
+                                              'dDay', appData.currentDDay!);
+
+                                          Get.back();
                                         },
-                                        icon: Icon(Icons.clear))),
-                                controller: _goalEditingController,
-                                onChanged: (value) async {
-                                  setState(() {});
-                                  appData.currentGoal = value;
-                                  SharedPreferences _prefs =
-                                      await SharedPreferences.getInstance();
-                                  _prefs.setString('goal', value);
-                                },
-                              ),
-                            )),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 15.w),
-                            child: Material(
-                                child: Text('디데이 설정',
-                                    style: GoogleFonts.notoSans(
-                                      fontSize: 31.sp,
-                                      backgroundColor: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ))),
-                          ),
-                          SizedBox(height: 15.h),
-                          SizedBox(
-                            width: 654.w,
-                            height: 615.h,
-                            child: SfDateRangePicker(
-                              //showActionButtons: true,
-                              selectionMode:
-                                  DateRangePickerSelectionMode.single,
-                              monthViewSettings:
-                                  const DateRangePickerMonthViewSettings(
-                                      dayFormat: 'EEE'),
-                              toggleDaySelection: true,
-                              allowViewNavigation: false,
-                              controller: _dateRangePickerController,
-                              initialDisplayDate: DateFormat('yyyy-MM-dd')
-                                  .parse(appData.currentSelectedDay!),
-                              initialSelectedDate: DateFormat('yyyy-MM-dd')
-                                  .parse(appData.currentSelectedDay!),
-                            ),
-                          ),
-                          SizedBox(height: 7.h),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                      border: Border(
-                                          top: BorderSide(
-                                              color: Color(0xFF777777)),
-                                          right: BorderSide(
-                                              color: Color(0xFF777777)))),
-                                  child: TextButton(
-                                      onPressed: () {
-                                        setState(() {});
-                                        _dateRangePickerController.displayDate =
-                                            DateTime.now();
-                                      },
-                                      child: const Text(
-                                        '오늘 날짜로',
-                                      )),
+                                        child: const Text('확 인')),
+                                  ),
                                 ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                      border: Border(
-                                          top: BorderSide(
-                                              color: Color(0xFF777777)))),
-                                  child: TextButton(
-                                      onPressed: () async {
-                                        setState(() {});
-
-                                        DateTime currentDay = DateTime(
-                                            now.year, now.month, now.day);
-
-                                        selectedDay = _dateRangePickerController
-                                            .selectedDate;
-
-                                        appData.currentNow = DateFormat(
-                                                'yyyy-MM-dd 00:00:00.000')
-                                            .format(currentDay);
-
-                                        appData.currentSelectedDay = DateFormat(
-                                                'yyyy-MM-dd 00:00:00.000')
-                                            .format(selectedDay ?? currentDay);
-
-                                        SharedPreferences _prefsNow =
-                                            await SharedPreferences
-                                                .getInstance();
-                                        _prefsNow.setString('now',
-                                            appData.currentNow.toString());
-
-                                        SharedPreferences _prefsSelectedDay =
-                                            await SharedPreferences
-                                                .getInstance();
-                                        _prefsSelectedDay.setString(
-                                            'selectedDate',
-                                            appData.currentSelectedDay
-                                                .toString());
-
-                                        if (selectedDay == null) {
-                                          appData.currentSelectedDay =
-                                              appData.currentNow;
-
-                                          appData.currentDDay = currentDay
-                                              .difference(appData.currentDDay
-                                                  as DateTime)
-                                              .inDays;
-                                        } else {
-                                          appData.currentDDay = selectedDay!
-                                              .difference(appData.currentDDay
-                                                  as DateTime)
-                                              .inDays;
-                                        }
-                                        SharedPreferences _prefDDay =
-                                            await SharedPreferences
-                                                .getInstance();
-                                        _prefDDay.setInt('dDay',
-                                            appData.currentDDay!.toInt());
-                                        print(
-                                            '1:${appData.currentNow} 2:${appData.currentSelectedDay} 3:${appData.currentDDay}');
-
-                                        Get.back();
-                                      },
-                                      child: const Text('확 인')),
-                                ),
-                              ),
-                            ],
-                          )
-                        ],
+                              ],
+                            )
+                          ],
+                        ),
                       ),
-                    )),
-              );
-            }),
-          );
+                    ),
+                  ),
+                ),
+              ),
+            );
+          });
         });
   }
 
-  SizedBox TodayCard() {
+  Container TodayCard() {
     String postId =
-        DateFormat('yyyy-MM-dd 00:00:00.000').format(DateTime.now());
+        DateFormat("yyyy-MM-dd 00:00:00.000").format(DateTime.now());
+    String formatted = DateFormat.yMMMd().format(DateTime.now());
     //print(postId);
 
-    return SizedBox(
+    return Container(
       width: 654.w,
       height: 654.h,
-      child: StreamBuilder<DocumentSnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('post')
-              .doc(postId)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              log(snapshot.error.toString());
-              return Container();
-            }
-            if (!snapshot.hasData) return Container();
+      child: Screenshot(
+        controller: _screenshotController,
+        child: StreamBuilder<DocumentSnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('post')
+                .doc(postId)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                log(snapshot.error.toString());
+                return Container();
+              }
+              if (!snapshot.hasData) return Container();
 
-            // print(snapshot);
-            // print(snapshot.data);
-            // print(snapshot.data!.data());
+              // print(snapshot);
+              // print(snapshot.data);
+              // print(snapshot.data!.data());
 
-            if (snapshot.data?.data() == null) {
-              // print('null data');
-              return Center(
-                child: Text('오늘은 명언이 없습니다.'),
-              );
-            }
+              if (snapshot.data?.data() == null) {
+                // print('null data');
+                return Center(
+                  child: Text('오늘은 명언이 없습니다.'),
+                );
+              }
 
-            String title =
-                (snapshot.data!.data() as Map<String, dynamic>)['title'];
-            String subtitle =
-                (snapshot.data!.data() as Map<String, dynamic>)['subtitle'];
-            String content =
-                (snapshot.data!.data() as Map<String, dynamic>)['content'];
+              String title =
+                  (snapshot.data!.data() as Map<String, dynamic>)['title'];
+              String subtitle =
+                  (snapshot.data!.data() as Map<String, dynamic>)['subtitle'];
+              String content =
+                  (snapshot.data!.data() as Map<String, dynamic>)['content'];
+              //String id = (snapshot.data!.data() as Map<String, dynamic>)['id'];
 
-            return Screenshot(
-              controller: _screenshotController,
-              child: Card(
+              return Card(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(36.r)),
                   child: Padding(
@@ -745,13 +815,25 @@ class _TodayScreenState extends State<TodayScreen>
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  title,
-                                  style: GoogleFonts.notoSans(
-                                      fontSize: 23.sp,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: -1.w,
-                                      wordSpacing: 34.h),
+                                Row(
+                                  children: [
+                                    Text(title,
+                                        style: GoogleFonts.notoSans(
+                                          fontSize: 23.sp,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: -1.sp,
+                                          height: 1.0,
+                                        )),
+                                    SizedBox(
+                                      width: 5.w,
+                                    ),
+                                    Container(
+                                      width: 25.w,
+                                      height: 25.h,
+                                      child: Image.asset(
+                                          'assets/images/pngkit_twitter-png_189183.png'),
+                                    ),
+                                  ],
                                 ),
                                 SizedBox(height: 6.h),
                                 Text(
@@ -759,11 +841,11 @@ class _TodayScreenState extends State<TodayScreen>
                                   style: GoogleFonts.notoSans(
                                       fontSize: 20.sp,
                                       fontWeight: FontWeight.normal,
-                                      letterSpacing: -1.w,
-                                      wordSpacing: 34.h),
+                                      letterSpacing: -1.sp,
+                                      height: 1.0),
                                 ),
                               ],
-                            )
+                            ),
                           ],
                         ),
                         SizedBox(height: 20.h),
@@ -772,9 +854,10 @@ class _TodayScreenState extends State<TodayScreen>
                           width: 356.w,
                           child: Text(content,
                               style: GoogleFonts.notoSans(
-                                  fontSize: 25.sp,
-                                  letterSpacing: -1.h,
-                                  wordSpacing: 34.sp),
+                                fontSize: 25.sp,
+                                letterSpacing: -1.13.sp,
+                                height: 1.3,
+                              ),
                               maxLines: 8,
                               overflow: TextOverflow.ellipsis),
                         ),
@@ -784,9 +867,11 @@ class _TodayScreenState extends State<TodayScreen>
                         Container(
                             width: MediaQuery.of(context).size.width,
                             child: Text(
-                              '${formattedNow}',
+                              '${formatted}',
                               style: GoogleFonts.notoSans(
                                 fontSize: 25.sp,
+                                letterSpacing: -1.13.sp,
+                                height: 1.0,
                               ),
                             ),
                             decoration: const BoxDecoration(
@@ -799,74 +884,76 @@ class _TodayScreenState extends State<TodayScreen>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Color(0xFF707070)),
+                            GestureDetector(
+                              onTap: () async {
+                                final imageSave =
+                                    await _screenshotController.capture();
+                                saveAndShare(imageSave);
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Color(0xFF707070)),
+                                ),
+                                width: 55.w,
+                                height: 55.h,
+                                child:
+                                    Center(child: Icon(Icons.share_outlined)),
                               ),
-                              width: 55.w,
-                              height: 55.h,
-                              child: Center(
-                                  child: IconButton(
-                                      padding: EdgeInsets.zero,
-                                      onPressed: () async {
-                                        final imageSave =
-                                            await _screenshotController
-                                                .capture();
-                                        saveAndShare(imageSave);
-                                      }, // _takeScreenshot,
-                                      icon: Icon(Icons.share_outlined))),
                             ),
                             SizedBox(
                               width: 11.w,
                             ),
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Color(0xFF707070))),
-                              width: 55.w,
-                              height: 55.h,
-                              child: Center(
-                                child: IconButton(
-                                    padding: EdgeInsets.zero,
-                                    onPressed: () async {
-                                      final imageSave =
-                                          await _screenshotController.capture();
-                                      if (imageSave == null) {}
-                                      await saveImage(imageSave);
-                                    },
-                                    icon: Icon(Icons.file_download_outlined)),
-
-                                //     'assets/images/save_icon.png'),
+                            GestureDetector(
+                              onTap: () async {
+                                final imageSave =
+                                    await _screenshotController.capture();
+                                if (imageSave == null) {}
+                                await saveImage(imageSave);
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    border:
+                                        Border.all(color: Color(0xFF707070))),
+                                width: 55.w,
+                                height: 55.h,
+                                child: Center(
+                                    child: Icon(Icons.file_download_outlined)),
                               ),
                             ),
                             SizedBox(
                               width: 12.w,
                             ),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Color(0xFF707070)),
-                              ),
-                              width: 55.w,
-                              height: 55.h,
-                              child: Center(
-                                child: IconButton(
-                                    padding: EdgeInsets.zero,
-                                    onPressed: () {
-                                      setState(() {});
+                            GestureDetector(
+                              onTap: () async {
+                                setState(() {
+                                  appData.isBookMarked = !appData.isBookMarked;
 
-                                      _isBookMarkSelected =
-                                          !_isBookMarkSelected;
-                                      _isBookMarkSelected
-                                          ? appData.savedPost.add(Post())
-                                          : appData.savedPost.removeLast();
-                                      //하루에 하나의 명언이 나오는데 새로운 명언이 나오면 데이터 다시...
-                                    },
-                                    icon: Icon(_isBookMarkSelected
+                                  // appData.isBookMarked
+                                  // ? databaseController.getPost(
+                                  //     postId: postId)
+                                  // : databaseController.deletePost(
+                                  //     postId: postId);
+                                });
+
+                                SharedPreferences _prefsPostId =
+                                    await SharedPreferences.getInstance();
+                                _prefsPostId.setBool(
+                                    'myPostId', appData.isBookMarked);
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Color(0xFF707070)),
+                                ),
+                                width: 55.w,
+                                height: 55.h,
+                                child: Center(
+                                    child: Icon(appData.isBookMarked
                                         ? Icons.bookmark_rounded
                                         : Icons.bookmark_border_outlined)),
                               ),
@@ -876,17 +963,21 @@ class _TodayScreenState extends State<TodayScreen>
                       ],
                     ),
                   ),
-                  color: Colors.white),
-            );
-          }),
+                  color: Colors.white);
+            }),
+      ),
     );
   }
 
   Widget EnlargeLastCard(Post? post) {
     if (post == null) return Container();
-
+    DateTime? formattedId = DateTime.tryParse(post.id.toString());
+    String formattedPostId = DateFormat.yMMMd().format(formattedId!);
     return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+      filter: ImageFilter.blur(
+        sigmaX: 5.0,
+        sigmaY: 5.0,
+      ),
       child: Container(
         color: Colors.black.withOpacity(0.5),
         width: MediaQuery.of(context).size.width,
@@ -901,7 +992,7 @@ class _TodayScreenState extends State<TodayScreen>
               width: 654.w,
               height: 654.h,
               child: Screenshot(
-                controller: _screenshotController,
+                controller: _lastScreenshotController,
                 child: Card(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(36.r)),
@@ -920,21 +1011,34 @@ class _TodayScreenState extends State<TodayScreen>
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    post.title.toString(),
-                                    style: GoogleFonts.notoSans(
-                                        fontSize: 23.sp,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: -1.w,
-                                        wordSpacing: 34.h),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        post.title.toString(),
+                                        style: GoogleFonts.notoSans(
+                                            fontSize: 23.sp,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: -1.sp,
+                                            height: 1.2),
+                                      ),
+                                      SizedBox(
+                                        width: 5.w,
+                                      ),
+                                      Container(
+                                        width: 25.w,
+                                        height: 25.h,
+                                        child: Image.asset(
+                                            'assets/images/pngkit_twitter-png_189183.png'),
+                                      ),
+                                    ],
                                   ),
                                   Text(
                                     post.subtitle.toString(),
                                     style: GoogleFonts.notoSans(
                                         fontSize: 20.sp,
                                         fontWeight: FontWeight.normal,
-                                        letterSpacing: -1.w,
-                                        wordSpacing: 34.h),
+                                        letterSpacing: -1.sp,
+                                        height: 1.2),
                                   ),
                                 ],
                               )
@@ -947,8 +1051,8 @@ class _TodayScreenState extends State<TodayScreen>
                             child: Text(post.content.toString(),
                                 style: GoogleFonts.notoSans(
                                     fontSize: 25.sp,
-                                    letterSpacing: -1.h,
-                                    wordSpacing: 34.sp),
+                                    letterSpacing: -1.sp,
+                                    height: 1.2),
                                 maxLines: 8,
                                 overflow: TextOverflow.ellipsis),
                           ),
@@ -957,7 +1061,7 @@ class _TodayScreenState extends State<TodayScreen>
                           ),
                           Container(
                               width: MediaQuery.of(context).size.width,
-                              child: Text('${formattedNow}'),
+                              child: Text(formattedPostId),
                               decoration: const BoxDecoration(
                                 border: Border(
                                     bottom:
@@ -969,53 +1073,48 @@ class _TodayScreenState extends State<TodayScreen>
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Color(0xFF707070)),
+                              GestureDetector(
+                                onTap: () async {
+                                  final imageSave =
+                                      await _lastScreenshotController.capture();
+                                  saveAndShare(imageSave);
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    border:
+                                        Border.all(color: Color(0xFF707070)),
+                                  ),
+                                  width: 55.w,
+                                  height: 55.h,
+                                  child: Center(
+                                    child: Icon(Icons.share_outlined),
+                                  ),
                                 ),
-                                width: 55.w,
-                                height: 55.h,
-                                child: Center(
-                                    child: IconButton(
-                                        padding: EdgeInsets.zero,
-                                        onPressed: () async {
-                                          final imageSave =
-                                              await _screenshotController
-                                                  .capture();
-                                          saveAndShare(imageSave);
-                                        },
-                                        icon: Icon(Icons.share_outlined))
-                                    // child: Image.asset(
-                                    //     'assets/images/share_icon.png'),
-                                    ),
                               ),
                               SizedBox(
                                 width: 11.w,
                               ),
-                              Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    border:
-                                        Border.all(color: Color(0xFF707070))),
-                                width: 55.w,
-                                height: 55.h,
-                                child: Center(
-                                    child: IconButton(
-                                        padding: EdgeInsets.zero,
-                                        onPressed: () async {
-                                          final imageSave =
-                                              await _screenshotController
-                                                  .capture();
-                                          if (imageSave == null) {}
-                                          await saveImage(imageSave);
-                                        },
-                                        icon:
-                                            Icon(Icons.file_download_outlined))
-                                    //     'assets/images/save_icon.png'),
-                                    ),
+                              GestureDetector(
+                                onTap: () async {
+                                  final imageSave =
+                                      await _lastScreenshotController.capture();
+                                  if (imageSave == null) {}
+                                  await saveImage(imageSave);
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      border:
+                                          Border.all(color: Color(0xFF707070))),
+                                  width: 55.w,
+                                  height: 55.h,
+                                  child: Center(
+                                      child:
+                                          Icon(Icons.file_download_outlined)),
+                                ),
                               ),
                               SizedBox(
                                 width: 12.w,
@@ -1049,7 +1148,7 @@ class _TodayScreenState extends State<TodayScreen>
     );
   }
 
-  Container SwiperCard(AppData appData) {
+  SwiperCard() {
     return Container(
       child: StreamBuilder<QuerySnapshot>(
           stream: _postStream,
@@ -1059,10 +1158,9 @@ class _TodayScreenState extends State<TodayScreen>
             if (snapshot.data?.size == 0) return Container();
 
             return Swiper(
-              itemCount: snapshot.data!.docs.length,
+              itemCount: snapshot == 30 ? 30 : snapshot.data!.docs.length,
               itemWidth: 600.w,
               itemHeight: 600.h,
-              onTap: (index) {},
               scrollDirection: Axis.vertical,
               layout: SwiperLayout.STACK,
               itemBuilder: (BuildContext context, int index) {
@@ -1074,13 +1172,12 @@ class _TodayScreenState extends State<TodayScreen>
                 String title = post.title ?? '';
                 String subtitle = post.subtitle ?? '';
                 String content = post.content ?? '';
+
                 return GestureDetector(
                   onTap: () {
                     setState(() {});
                     _selectedPost = post;
                     _isSelected = !_isSelected;
-
-                    print(index);
                   },
                   child: Container(
                     decoration: BoxDecoration(boxShadow: const [
@@ -1109,13 +1206,26 @@ class _TodayScreenState extends State<TodayScreen>
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      title,
-                                      style: GoogleFonts.notoSans(
-                                          fontSize: 23.sp,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: -1.w,
-                                          wordSpacing: 34.h),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          title,
+                                          style: GoogleFonts.notoSans(
+                                              fontSize: 23.sp,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: -1.sp,
+                                              height: 1.1),
+                                        ),
+                                        SizedBox(
+                                          width: 5.w,
+                                        ),
+                                        Container(
+                                          width: 25.w,
+                                          height: 25.h,
+                                          child: Image.asset(
+                                              'assets/images/pngkit_twitter-png_189183.png'),
+                                        ),
+                                      ],
                                     ),
                                     SizedBox(
                                       height: 6.h,
@@ -1125,8 +1235,8 @@ class _TodayScreenState extends State<TodayScreen>
                                       style: GoogleFonts.notoSans(
                                           fontSize: 20.sp,
                                           fontWeight: FontWeight.normal,
-                                          letterSpacing: -1.w,
-                                          wordSpacing: 34.h),
+                                          letterSpacing: -1.sp,
+                                          height: 1.1),
                                     ),
                                   ],
                                 )
@@ -1140,8 +1250,8 @@ class _TodayScreenState extends State<TodayScreen>
                                 content,
                                 style: GoogleFonts.notoSans(
                                     fontSize: 25.sp,
-                                    letterSpacing: -1.h,
-                                    wordSpacing: 34.sp),
+                                    letterSpacing: -1.sp,
+                                    height: 1.2),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 8,
                               ),
@@ -1160,15 +1270,16 @@ class _TodayScreenState extends State<TodayScreen>
 
   SizedBox ShowDDay() {
     return SizedBox(
-        width: 135.w,
-        child: Text(
-          appData.currentSelectedDay == null ||
-                  appData.currentDDay == 0 ||
-                  appData.currentDDay! < 0
-              ? 'D-000'
-              : 'D-${appData.currentDDay!.toInt()}',
-          style: TextStyle(fontSize: 35.sp),
-        ));
+      width: 135.w,
+      child: Text(
+        appData.currentSelectedDay == null ||
+                appData.currentDDay == 0 ||
+                appData.currentDDay! <= 0
+            ? 'D-000'
+            : 'D-${appData.currentDDay}',
+        style: TextStyle(fontSize: 35.sp),
+      ),
+    );
   }
 
   SizedBox ShowGoal(AppData appData) {
@@ -1176,7 +1287,7 @@ class _TodayScreenState extends State<TodayScreen>
       width: 397.w,
       child: Text(
         _goalEditingController!.text == ''
-            ? '목표를 정하십시오'
+            ? '목표를 작성해주세요.'
             : appData.currentGoal.toString(),
         style: TextStyle(
             fontSize: 35.sp,
@@ -1236,7 +1347,6 @@ class _TodayScreenState extends State<TodayScreen>
         children: [
           GestureDetector(
             onTap: () {
-              setState(() {});
               _tabController!.animateTo(_currentIndex);
             },
             child: SizedBox(
@@ -1259,30 +1369,54 @@ class _TodayScreenState extends State<TodayScreen>
       ),
     );
   }
-}
 
-Future saveAndShare(Uint8List? bytes) async {
-  final directory = await getApplicationDocumentsDirectory();
-  final imageSave = File('${directory.path}/flutter.png');
+//   Future _dailyAtTimeNotification() async {
+//     var time = Time(02, 31, 0);
+//     var android = AndroidNotificationDetails(
+//         'your channel id', 'your channel name',
+//         importance: Importance.max, priority: Priority.high);
 
-  imageSave.writeAsBytesSync(bytes!);
-  await Share.shareFiles([imageSave.path]);
-}
+//     var ios = IOSNotificationDetails();
+//     var detail = NotificationDetails(iOS: ios);
 
-Future<String> saveImage(Uint8List? bytes) async {
-  await [Permission.storage].request();
+//     await _flutterLocalNotificationsPlugin.showDailyAtTime(
+//       0,
+//       '공명',
+//       '오늘의 공명을 확인하세요!',
+//       time,
+//       detail,
+//       payload: 'Hello Flutter',
+//     );
+//   }
+// }
 
-  final time = DateTime.now().toIso8601String();
-  final name = 'screenShot_$time';
-  final result = await ImageGallerySaver.saveImage(bytes!, name: name);
+  Future saveAndShare(Uint8List? bytes) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final imageSave = File('${directory.path}/flutter.png');
 
-  return result['filePath'];
+    imageSave.writeAsBytesSync(bytes!);
+    await Share.shareFiles([imageSave.path]);
+  }
+
+  Future<String> saveImage(Uint8List? bytes) async {
+    await [Permission.storage].request();
+
+    final time = DateTime.now().toIso8601String();
+    final name = 'screenShot_$time';
+    final result = await ImageGallerySaver.saveImage(bytes!, name: name);
+
+    return result['filePath'];
+  }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => false;
 }
 
 class AdsBottom extends StatelessWidget {
-  const AdsBottom({
-    Key? key,
-  }) : super(key: key);
+  // const AdsBottom({
+  //   Key? key,
+  // }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -1295,9 +1429,9 @@ class AdsBottom extends StatelessWidget {
 }
 
 class ExitApp extends StatelessWidget {
-  const ExitApp({
-    Key? key,
-  }) : super(key: key);
+  // const ExitApp({
+  //   Key? key,
+  // }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

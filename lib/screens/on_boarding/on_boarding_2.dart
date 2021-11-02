@@ -28,7 +28,7 @@ class _OnBoarding2State extends State<OnBoarding2> {
                     height: 374.h,
                   ),
                   SizedBox(
-                    height: 80.h,
+                    height: 87.h,
                     child: FadeIn(
                       duration: Duration(seconds: 3),
                       //curve: Curves.easeInOut,
@@ -37,39 +37,40 @@ class _OnBoarding2State extends State<OnBoarding2> {
                         style: TextStyle(
                             fontSize: 60.sp,
                             fontWeight: FontWeight.bold,
-                            wordSpacing: -7.5.w,
+                            letterSpacing: -4.5.sp,
                             height: 1.0),
                       ),
                     ),
                   ),
                   SizedBox(
-                    width: 512.w,
-                    height: 50.h,
+                    width: 509.w,
+                    height: 91.h,
                     child: FadeIn(
                       duration: Duration(seconds: 3),
                       child: Text(
-                        '공부시작 전, 공명을 켜고',
+                        '공부 시작 전, 공명을 켜고\n명언 한 줄로 원하는 목표에 다가가세요.',
                         style: TextStyle(
                           fontSize: 35.sp,
-                          wordSpacing: -7.5.w,
+                          letterSpacing: -2.63.sp,
+                          height: 1.1,
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 590.w,
-                    height: 50.h,
-                    child: FadeIn(
-                      duration: Duration(seconds: 3),
-                      child: Text(
-                        '명언 한 줄로 원하는 목표에 다가가세요.',
-                        style: TextStyle(
-                          fontSize: 35.sp,
-                          wordSpacing: -7.5.w,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // SizedBox(
+                  //   width: 590.w,
+                  //   height: 50.h,
+                  //   child: FadeIn(
+                  //     duration: Duration(seconds: 3),
+                  //     child: Text(
+                  //       '명언 한 줄로 원하는 목표에 다가가세요.',
+                  //       style: TextStyle(
+                  //         fontSize: 35.sp,
+                  //         wordSpacing: -7.5.w,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   SizedBox(height: 44.h),
                   FadeIn(
                     duration: Duration(seconds: 1),
@@ -88,7 +89,7 @@ class _OnBoarding2State extends State<OnBoarding2> {
                                 offset: Offset(5.0, 5.0)),
                           ],
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(50.r)),
+                          borderRadius: BorderRadius.circular(36.r)),
                       width: 572.w,
                       height: 509.h,
                     ),
