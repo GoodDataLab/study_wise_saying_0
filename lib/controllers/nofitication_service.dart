@@ -43,7 +43,7 @@ class NotificationService {
             android: initializationSettingsAndroid,
             iOS: initializationSettingsIOS);
 
-    // tz.initializeTimeZones();
+    //tz.initializeTimeZones();
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
@@ -63,26 +63,25 @@ class NotificationService {
     };
   }
 
-  Future<void> everyAtTimeNotification() async {
-    var platformChannelSpecifics = NotificationDetails(
-        iOS: iosNotificationDetails, android: androidNotificationDetails);
-    //var time = Time(09, 0, 0);
+  // Future<void> everyAtTimeNotification() async {
+  //   var platformChannelSpecifics = NotificationDetails(
+  //       iOS: iosNotificationDetails, android: androidNotificationDetails);
+  //   //var time = Time(09, 0, 0);
 
-    await flutterLocalNotificationsPlugin.periodicallyShow(
-      1,
-      '공명',
-      '오늘의 공명을 확인하세요!',
-      RepeatInterval.everyMinute,
-      platformChannelSpecifics,
-      payload: 'Hello Flutter',
-    );
-  }
+  //   await flutterLocalNotificationsPlugin.periodicallyShow(
+  //     1,
+  //     '공명',
+  //     '오늘의 공명을 확인하세요!',
+  //     RepeatInterval.everyMinute,
+  //     platformChannelSpecifics,
+  //     payload: 'Hello Flutter',
+  //   );
+  // }
 
   Future<void> ScheduleTimeNotification() async {
     Time alarmTime = Time(9, 00, 00);
     var platformChannelSpecifics = NotificationDetails(
         iOS: iosNotificationDetails, android: androidNotificationDetails);
-    //var time = Time(09, 0, 0);
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
       0,
@@ -105,6 +104,8 @@ tz.TZDateTime scheduledDaily(Time alarmTime) {
   final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
   tz.TZDateTime scheduledDate = tz.TZDateTime(
       tz.local, now.year, now.month, now.day, alarmTime.hour, alarmTime.minute);
-  //scheduledDate = scheduledDate.add(const Duration(days: 1));
+  if (scheduledDate.isBefore(now)) {
+    scheduledDate = scheduledDate.add(const Duration(days: 1));
+  }
   return scheduledDate;
 }

@@ -13,7 +13,9 @@ void main() async {
   admobController.initMobileAds;
   await NotificationService().init();
   print('!@#');
-  runApp(
-    App(), // Wrap your app
-  );
+  //runApp(
+  // DevicePreview(enabled: !kReleaseMode, builder: (context) => App()),
+  // Wrap your app
+  // );
+  runApp(App());
 }

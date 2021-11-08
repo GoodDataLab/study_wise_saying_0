@@ -57,7 +57,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   child: Align(
                     alignment: Alignment.center,
                     child: Padding(
-                      padding: EdgeInsets.only(top: 430),
+                      padding: EdgeInsets.only(top: 720.h),
                       child: _pageIndicatorsWidget(
                         length: _onBoardingsWithIndicator.length,
                         page: _page - _onBoardings.length,

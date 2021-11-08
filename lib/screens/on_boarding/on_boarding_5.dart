@@ -57,20 +57,6 @@ class _OnBoarding5State extends State<OnBoarding5> {
                       ),
                     ),
                   ),
-                  // SizedBox(
-                  //   width: 590.w,
-                  //   height: 50.h,
-                  //   child: FadeIn(
-                  //     duration: Duration(seconds: 3),
-                  //     child: Text(
-                  //       '나의 공명을 만들어보세요',
-                  //       style: TextStyle(
-                  //         fontSize: 35.sp,
-                  //         wordSpacing: -7.5.w,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                   SizedBox(height: 44.h),
                   FadeIn(
                     duration: Duration(seconds: 1),
@@ -97,39 +83,44 @@ class _OnBoarding5State extends State<OnBoarding5> {
                   SizedBox(height: 195.h),
                   FadeIn(
                     duration: Duration(seconds: 2),
-                    child: Container(
-                      width: 572.w,
-                      height: 79.h,
-                      decoration: BoxDecoration(boxShadow: [
-                        BoxShadow(
-                            color: Colors.black.withOpacity(.2),
-                            blurRadius: 5.0,
-                            spreadRadius: 5.0,
-                            offset: Offset(5.0, 5.0)),
-                      ], borderRadius: BorderRadius.circular(60.r)),
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          setState(() {});
-                          appData.isStarted = true;
-                          SharedPreferences _prefs =
-                              await SharedPreferences.getInstance();
-                          _prefs.setBool('isStarted', true);
-                          Get.to(() => TodayScreen());
-                        },
-                        child: Text(
-                          '지금부터 공명하기',
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 30.sp,
-                              wordSpacing: -2.1.sp),
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: Get.height / 10),
+                      child: Container(
+                        width: 572.w,
+                        height: 79.h,
+                        decoration: BoxDecoration(boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withOpacity(.2),
+                              blurRadius: 5.0,
+                              spreadRadius: 5.0,
+                              offset: Offset(5.0, 5.0)),
+                        ], borderRadius: BorderRadius.circular(60.r)),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            setState(() {});
+                            appData.isStarted = true;
+                            SharedPreferences _prefs =
+                                await SharedPreferences.getInstance();
+                            _prefs.setBool('isStarted', true);
+                            Get.to(() => TodayScreen());
+                          },
+                          child: Text(
+                            '지금부터 공명하기',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 30.sp,
+                                letterSpacing: -2.1.sp),
+                          ),
+                          style: ButtonStyle(
+                              shape: MaterialStateProperty.all<
+                                      RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(30.r))),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith(
+                                      (_) => Colors.white)),
                         ),
-                        style: ButtonStyle(
-                            shape: MaterialStateProperty.all<
-                                    RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30.r))),
-                            backgroundColor: MaterialStateProperty.resolveWith(
-                                (_) => Colors.white)),
                       ),
                     ),
                   ),

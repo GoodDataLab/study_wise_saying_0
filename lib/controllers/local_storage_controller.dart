@@ -32,4 +32,20 @@ class LocalStorageController {
       print(e.toString());
     }
   }
+
+  Future<void> setSavedPostIds(List<String> ids) async {
+    _prefs = await SharedPreferences.getInstance();
+    _prefs!.remove('savedPost');
+    _prefs!.setStringList('savedPost', ids);
+  }
+
+  Future<List<String>> getSavedPostIds() async {
+    _prefs = await SharedPreferences.getInstance();
+    List<String>? result = _prefs!.getStringList('savedPost');
+    if (result == null) {
+      return [];
+    } else {
+      return result;
+    }
+  }
 }

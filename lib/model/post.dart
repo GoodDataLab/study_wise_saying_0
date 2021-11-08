@@ -3,6 +3,7 @@ class Post {
   String? title;
   String? content;
   String? subtitle;
+  String? imageUrl;
   //DateTime? dateCreated;
 
   Post({
@@ -11,6 +12,7 @@ class Post {
     this.content,
     //this.dateCreated,
     this.id,
+    this.imageUrl,
   });
 
   //String toStrint() => id! + "/" + title! + "/" + content! + '/' + subtitle!;
@@ -19,6 +21,7 @@ class Post {
       : id = json['id'],
         title = json['title'],
         content = json['content'],
+        imageUrl = json['imageUrl'],
         subtitle = json['subtitle'];
   // dateCreated = json['dateCreated'].toDate();
 
@@ -27,6 +30,7 @@ class Post {
         'title': title,
         'content': content,
         'subtitle': subtitle,
+        'imageUrl': imageUrl,
         // 'dateCreated': dateCreated,
       };
 }

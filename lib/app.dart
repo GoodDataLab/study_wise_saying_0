@@ -1,4 +1,5 @@
 import 'package:device_preview/device_preview.dart';
+import 'package:flutter/services.dart';
 
 import 'common_import.dart';
 import 'screens/splash_screen.dart';
@@ -6,11 +7,13 @@ import 'screens/splash_screen.dart';
 class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     Get.put(AppData());
 
     return ScreenUtilInit(
       designSize: Size(750, 1624),
       builder: () => GetMaterialApp(
+        locale: DevicePreview.locale(context),
         debugShowCheckedModeBanner: false,
         title: 'FlynnApps',
         home: SplashScreen(),

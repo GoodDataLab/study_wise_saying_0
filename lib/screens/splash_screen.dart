@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:intl/intl.dart';
+import 'package:study_wise_saying/controllers/local_storage_controller.dart';
 import 'package:study_wise_saying/controllers/nofitication_service.dart';
 import 'package:study_wise_saying/model/post.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import 'onboading_screen.dart';
 import 'package:show_up_animation/show_up_animation.dart';
@@ -19,6 +22,8 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   //late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
+  DateRangePickerController _dateRangePickerController =
+      DateRangePickerController();
 
   @override
   void initState() {
@@ -30,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     _getLocalData();
 
-    Future.delayed(Duration(milliseconds: 5000)).then((value) =>
+    Future.delayed(Duration(milliseconds: 6000)).then((value) =>
         Get.off(() => appData.isStarted ? TodayScreen() : OnBoardingScreen()));
     super.initState();
   }
@@ -52,9 +57,9 @@ class _SplashScreenState extends State<SplashScreen> {
                 ],
               ),
             ),
-            delayStart: Duration(milliseconds: 000),
-            animationDuration: Duration(milliseconds: 3000),
-            curve: Curves.bounceIn,
+            delayStart: Duration(milliseconds: 1000),
+            animationDuration: Duration(milliseconds: 4000),
+            curve: Curves.easeIn,
             direction: Direction.vertical,
             offset: 0.0,
           ),
@@ -68,14 +73,14 @@ class _SplashScreenState extends State<SplashScreen> {
     SharedPreferences instance = await SharedPreferences.getInstance();
 
     String? goal = instance.getString('goal');
-    int? dDay = instance.getInt('dDay');
-    String selectedDate =
-        instance.getString('selectedDate') ?? appData.currentNow!;
-
-    String? now = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    String? selectedDate = instance.getString('selectedDate');
+    DateTime today = DateTime.now();
 
     bool isStarted = instance.getBool('isStarted') ?? false;
     bool myPostId = instance.getBool('myPostId') ?? false;
+    List<String> savedIds = await localStorageController.getSavedPostIds();
+    appData.updateSavedPostsByIds(savedIds);
+    // instance.remove('savedPost');
 
     //print(now);
 
@@ -95,12 +100,12 @@ class _SplashScreenState extends State<SplashScreen> {
       appData.isStarted = isStarted;
     }
 
-    if (myPostId == false) {
-      //do noting
-    } else {
-      AppData appData = Get.find();
-      appData.isBookMarked = myPostId;
-    }
+    // if (myPostId == false) {
+    //   //do noting
+    // } else {
+    //   AppData appData = Get.find();
+    //   appData.isBookMarked = myPostId;
+    // }
     // if (postMyId == null) {
     //   //do notiing
     // } else {
@@ -109,24 +114,30 @@ class _SplashScreenState extends State<SplashScreen> {
 
     // }
 
-    if (dDay == null) {
-      // do nothing
-    } else {
-      AppData appData = Get.find();
-      appData.currentDDay = dDay;
-      print(dDay);
-    }
+    // if (dDay == null) {
+    //   // do nothing
+    // } else {
+    //   AppData appData = Get.find();
+    //   appData.currentDDay = dDay;
+    //   print(dDay);
+    // }
 
-    //AppData appData = Get.find();
-    appData.currentNow = now;
-    print(now);
+    // AppData appData = Get.find();
+    // appData.currentNow = now;
+    // print(now);
 
     if (selectedDate == null) {
       AppData appData = Get.find();
-      appData.currentSelectedDay = appData.currentNow;
+      appData.currentSelectedDay = DateTime.now().toString();
     } else {
       AppData appData = Get.find();
+      appData.currentNow = DateTime(today.year, today.month, today.day);
+      appData.currentDDay =
+          DateTime.parse(selectedDate).difference(appData.currentNow!).inDays;
+
       appData.currentSelectedDay = selectedDate;
+      print(appData.currentNow);
+
       print(selectedDate);
     }
   }
