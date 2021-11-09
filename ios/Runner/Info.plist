@@ -30,6 +30,12 @@
 	<string>명언 이미지를 앨범에 저장하기 위해 권한이 필요합니다.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>명언 이미지를 앨범에 저장하기 위해 권한이 필요합니다.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Used to Location&apos;s Info always for Using Beacon.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Used to Location&apos;s Info always for Using Beacon.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Used to Location&apos;s Info for Using Beacon when In Use.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>

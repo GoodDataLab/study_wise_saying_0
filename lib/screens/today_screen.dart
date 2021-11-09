@@ -45,6 +45,9 @@ class _TodayScreenState extends State<TodayScreen>
   bool _isSelected = false;
   bool _isMySelected = false;
   bool _isBookMarkSelected = false;
+  bool _clickedTodaySave = true;
+  bool _clickedLastSave = true;
+  bool _clickedMySave = true;
 
   TextEditingController? _goalEditingController = TextEditingController();
   DateRangePickerController _dateRangePickerController =
@@ -189,7 +192,7 @@ class _TodayScreenState extends State<TodayScreen>
                     Container(
                       child: Column(
                         children: [
-                          SizedBox(height: 150.h),
+                          SizedBox(height: 170.h),
                           // 오늘 공명
                           TodayCard(),
                         ],
@@ -460,227 +463,265 @@ class _TodayScreenState extends State<TodayScreen>
               Container(
                 decoration:
                     BoxDecoration(borderRadius: BorderRadius.circular(15.0.r)),
-                width: 654.w,
-                height: 654.w,
-                child: Screenshot(
-                  controller: _myScreenshotController,
-                  child: Card(
-                      shape: RoundedRectangleBorder(
+                width: 660.w,
+                height: 660.w,
+                child: Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(36.r)),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(36.r)),
                       child: Padding(
                         padding: EdgeInsets.only(
-                            left: 64.w, top: 87.h, right: 64.w, bottom: 60.h),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: post.imageUrl != null
-                                      ? Colors.transparent
-                                      : Colors.tealAccent,
-                                  radius: 37.r,
-                                  child: Padding(
-                                    padding: EdgeInsets.all(5.r),
-                                    child: Center(
-                                      child: post.imageUrl != null
-                                          ? Image.network(
-                                              post.imageUrl.toString(),
-                                              fit: BoxFit.cover,
+                            left: 32.w, top: 43.5.h, right: 32.w, bottom: 30.h),
+                        child: Screenshot(
+                          controller: _myScreenshotController,
+                          child: Container(
+                            color: Colors.white,
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  left: 32.w,
+                                  top: 43.5.h,
+                                  right: 32.w,
+                                  bottom: 30.h),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      post.imageUrl != null
+                                          ? ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(1000),
+                                              child: SizedBox(
+                                                width: 72.w,
+                                                height: 72.w,
+                                                child: FadeInImage.assetNetwork(
+                                                  fit: BoxFit.cover,
+                                                  placeholder:
+                                                      'assets/images/shimmer.gif',
+                                                  image:
+                                                      post.imageUrl.toString(),
+                                                ),
+                                              ),
                                             )
-                                          : Image.asset(
-                                              'assets/images/logo_small.png',
+                                          : CircleAvatar(
+                                              backgroundColor:
+                                                  post.imageUrl != null
+                                                      ? Colors.transparent
+                                                      : Colors.tealAccent,
+                                              radius: 37.r,
+                                              child: Padding(
+                                                padding: EdgeInsets.all(5.r),
+                                                child: Center(
+                                                  child: post.imageUrl != null
+                                                      ? Image.network(
+                                                          post.imageUrl
+                                                              .toString(),
+                                                          fit: BoxFit.cover,
+                                                        )
+                                                      : Image.asset(
+                                                          'assets/images/logo_small.png',
+                                                        ),
+                                                ),
+                                              ),
                                             ),
+                                      SizedBox(width: 15.w),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                post.title.toString(),
+                                                style: GoogleFonts.notoSans(
+                                                    fontSize: 23.sp,
+                                                    fontWeight: FontWeight.bold,
+                                                    letterSpacing: -1.sp,
+                                                    height: 1.1),
+                                              ),
+                                              SizedBox(
+                                                width: 5.w,
+                                              ),
+                                              Container(
+                                                width: 25.w,
+                                                height: 25.w,
+                                                child: Image.asset(
+                                                    'assets/images/pngkit_twitter-png_189183.png'),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 6.h),
+                                          Text(
+                                            post.subtitle.toString(),
+                                            style: GoogleFonts.notoSans(
+                                                fontSize: 20.sp,
+                                                fontWeight: FontWeight.normal,
+                                                letterSpacing: -1.sp,
+                                                height: 1.2),
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                  SizedBox(height: 18.h),
+                                  Container(
+                                    height: 270.h,
+                                    width: 523.w,
+                                    child: Text(post.content.toString(),
+                                        style: GoogleFonts.notoSans(
+                                            fontSize: 25.sp,
+                                            letterSpacing: -1.sp,
+                                            height: 1.3),
+                                        maxLines: 8,
+                                        overflow: TextOverflow.ellipsis),
+                                  ),
+                                  SizedBox(
+                                    height: 18.h,
+                                  ),
+                                  Text(
+                                    '${formattedMyPostId}',
+                                    style: GoogleFonts.notoSans(
+                                      fontSize: 25.sp,
+                                      letterSpacing: -1.13.sp,
+                                      height: 1.1,
                                     ),
                                   ),
-                                ),
-                                SizedBox(width: 15.w),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
+                                  SizedBox(
+                                    height: 12.h,
+                                  ),
+                                  Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    height: 0.5.h,
+                                    color: Colors.black,
+                                  ),
+                                  SizedBox(
+                                    height: 12.h,
+                                  ),
+                                  Visibility(
+                                    visible: _clickedMySave,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
-                                        Text(
-                                          post.title.toString(),
-                                          style: GoogleFonts.notoSans(
-                                              fontSize: 23.sp,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: -1.sp,
-                                              height: 1.1),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            final imageSave =
+                                                await _myScreenshotController
+                                                    .capture();
+                                            saveAndShare(imageSave);
+                                          },
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: Color(0xFF707070)),
+                                            ),
+                                            width: 50.w,
+                                            height: 50.w,
+                                            child: const Center(
+                                                child: Icon(
+                                              Icons.share_outlined,
+                                              size: 18,
+                                            )),
+                                          ),
                                         ),
                                         SizedBox(
-                                          width: 5.w,
+                                          width: 11.w,
                                         ),
-                                        Container(
-                                          width: 25.w,
-                                          height: 25.w,
-                                          child: Image.asset(
-                                              'assets/images/pngkit_twitter-png_189183.png'),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            _clickedMySave = !_clickedMySave;
+                                            setState(() {});
+                                            final imageSave =
+                                                await _myScreenshotController
+                                                    .capture();
+                                            if (imageSave == null) {}
+                                            await saveImage(imageSave);
+                                            _clickedMySave = !_clickedMySave;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                    color: Color(0xFF707070))),
+                                            width: 50.w,
+                                            height: 50.w,
+                                            child: const Center(
+                                                child: Icon(
+                                              Icons.file_download_outlined,
+                                              size: 18,
+                                            )),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 11.w,
+                                        ),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            List<String> savedIds =
+                                                appData.getIdsOfSavedPost();
+
+                                            if (savedIds.contains(post.id) ==
+                                                false) {
+                                              appData.savedPost.add(Post(
+                                                id: post.id,
+                                                title: post.title,
+                                                subtitle: post.subtitle,
+                                                content: post.content,
+                                              ));
+                                              List<String> ids =
+                                                  appData.getIdsOfSavedPost();
+                                              localStorageController
+                                                  .setSavedPostIds(ids);
+                                              setState(() {});
+                                            } else {
+                                              appData.savedPost.removeWhere(
+                                                  (element) =>
+                                                      element.id == post.id);
+                                              log(appData.savedPost.length
+                                                  .toString());
+
+                                              List<String> ids =
+                                                  appData.getIdsOfSavedPost();
+                                              localStorageController
+                                                  .setSavedPostIds(ids);
+                                              _isMySelected = !_isMySelected;
+                                              setState(() {});
+                                            }
+                                            appData.update();
+                                          },
+                                          child: Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                    color: Color(0xFF707070)),
+                                              ),
+                                              width: 50.w,
+                                              height: 50.w,
+                                              child: const Center(
+                                                child: Icon(
+                                                  Icons.bookmark_rounded,
+                                                  size: 18,
+                                                ),
+                                              )),
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: 6.h),
-                                    Text(
-                                      post.subtitle.toString(),
-                                      style: GoogleFonts.notoSans(
-                                          fontSize: 20.sp,
-                                          fontWeight: FontWeight.normal,
-                                          letterSpacing: -1.sp,
-                                          height: 1.2),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(height: 18.h),
-                            Container(
-                              height: 270.h,
-                              width: 523.w,
-                              child: Text(post.content.toString(),
-                                  style: GoogleFonts.notoSans(
-                                      fontSize: 25.sp,
-                                      letterSpacing: -1.sp,
-                                      height: 1.3),
-                                  maxLines: 8,
-                                  overflow: TextOverflow.ellipsis),
-                            ),
-                            SizedBox(
-                              height: 18.h,
-                            ),
-                            Text(
-                              '${formattedMyPostId}',
-                              style: GoogleFonts.notoSans(
-                                fontSize: 25.sp,
-                                letterSpacing: -1.13.sp,
-                                height: 1.1,
+                                  )
+                                ],
                               ),
                             ),
-                            SizedBox(
-                              height: 12.h,
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: 0.5.h,
-                              color: Colors.black,
-                            ),
-                            // Container(
-                            //     width: MediaQuery.of(context).size.width,
-                            //     child: Text(formattedMyPostId),
-                            //     decoration: const BoxDecoration(
-                            //       border: Border(
-                            //           bottom:
-                            //               BorderSide(color: Color(0xFF777777))),
-                            //     )),
-                            SizedBox(
-                              height: 12.h,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                GestureDetector(
-                                  onTap: () async {
-                                    final imageSave =
-                                        await _myScreenshotController.capture();
-                                    saveAndShare(imageSave);
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      shape: BoxShape.circle,
-                                      border:
-                                          Border.all(color: Color(0xFF707070)),
-                                    ),
-                                    width: 50.w,
-                                    height: 50.w,
-                                    child: const Center(
-                                        child: Icon(
-                                      Icons.share_outlined,
-                                      size: 18,
-                                    )),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 11.w,
-                                ),
-                                GestureDetector(
-                                  onTap: () async {
-                                    final imageSave =
-                                        await _myScreenshotController.capture();
-                                    if (imageSave == null) {}
-                                    await saveImage(imageSave);
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                            color: Color(0xFF707070))),
-                                    width: 50.w,
-                                    height: 50.w,
-                                    child: const Center(
-                                        child: Icon(
-                                      Icons.file_download_outlined,
-                                      size: 18,
-                                    )),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 11.w,
-                                ),
-                                GestureDetector(
-                                  onTap: () async {
-                                    List<String> savedIds =
-                                        appData.getIdsOfSavedPost();
-
-                                    if (savedIds.contains(post.id) == false) {
-                                      appData.savedPost.add(Post(
-                                        id: post.id,
-                                        title: post.title,
-                                        subtitle: post.subtitle,
-                                        content: post.content,
-                                      ));
-                                      List<String> ids =
-                                          appData.getIdsOfSavedPost();
-                                      localStorageController
-                                          .setSavedPostIds(ids);
-                                      setState(() {});
-                                    } else {
-                                      appData.savedPost.removeWhere(
-                                          (element) => element.id == post.id);
-                                      log(appData.savedPost.length.toString());
-
-                                      List<String> ids =
-                                          appData.getIdsOfSavedPost();
-                                      localStorageController
-                                          .setSavedPostIds(ids);
-                                      _isMySelected = !_isMySelected;
-                                      setState(() {});
-                                    }
-                                    appData.update();
-                                  },
-                                  child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                            color: Color(0xFF707070)),
-                                      ),
-                                      width: 50.w,
-                                      height: 50.w,
-                                      child: const Center(
-                                        child: Icon(
-                                          Icons.bookmark_rounded,
-                                          size: 18,
-                                        ),
-                                      )),
-                                ),
-                              ],
-                            )
-                          ],
+                          ),
                         ),
                       ),
-                      color: Colors.white),
-                ),
+                    ),
+                    color: Colors.white),
               ),
             ],
           ),
@@ -880,280 +921,317 @@ class _TodayScreenState extends State<TodayScreen>
     String formatted = DateFormat.yMMMd().format(DateTime.now());
 
     return Container(
-      width: 654.w,
-      height: 654.w,
-      child: Screenshot(
-        controller: _screenshotController,
-        child: StreamBuilder<DocumentSnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('post')
-                .doc(postId)
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                log(snapshot.error.toString());
-                return Container();
-              }
-              if (!snapshot.hasData) return Container();
+      width: 660.w,
+      height: 660.w,
+      child: StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('post')
+              .doc(postId)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              log(snapshot.error.toString());
+              return Container();
+            }
+            if (!snapshot.hasData) return Container();
 
-              // print(snapshot);
-              // print(snapshot.data);
-              // print(snapshot.data!.data());
+            // print(snapshot);
+            // print(snapshot.data);
+            // print(snapshot.data!.data());
 
-              if (snapshot.data?.data() == null) {
-                // print('null data');
-                return Center(
-                  child: Text('오늘은 명언이 없습니다.'),
-                );
-              }
+            if (snapshot.data?.data() == null) {
+              // print('null data');
+              return Center(
+                child: Text('오늘은 명언이 없습니다.'),
+              );
+            }
 
-              String title =
-                  (snapshot.data!.data() as Map<String, dynamic>)['title'];
-              String subtitle =
-                  (snapshot.data!.data() as Map<String, dynamic>)['subtitle'];
-              String content =
-                  (snapshot.data!.data() as Map<String, dynamic>)['content'];
-              String id = (snapshot.data!.data() as Map<String, dynamic>)['id'];
-              String? imageUrl =
-                  (snapshot.data!.data() as Map<String, dynamic>)['imageUrl'];
+            String title =
+                (snapshot.data!.data() as Map<String, dynamic>)['title'];
+            String subtitle =
+                (snapshot.data!.data() as Map<String, dynamic>)['subtitle'];
+            String content =
+                (snapshot.data!.data() as Map<String, dynamic>)['content'];
+            String id = (snapshot.data!.data() as Map<String, dynamic>)['id'];
+            String? imageUrl =
+                (snapshot.data!.data() as Map<String, dynamic>)['imageUrl'];
 
-              return Container(
-                decoration: BoxDecoration(
-                  boxShadow: const [
-                    BoxShadow(
-                      blurRadius: 10.0,
-                      color: Colors.grey,
+            return Container(
+              decoration: BoxDecoration(
+                boxShadow: const [
+                  BoxShadow(
+                    blurRadius: 10.0,
+                    color: Colors.grey,
+                  ),
+                ],
+                borderRadius: BorderRadius.circular(36.0.r),
+              ),
+              child: Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(36.r)),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(36.r),
                     ),
-                  ],
-                  borderRadius: BorderRadius.circular(36.0.r),
-                ),
-                child: Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(36.r)),
                     child: Padding(
                       padding: EdgeInsets.only(
-                          left: 64.w, top: 87.h, right: 64.w, bottom: 60.h),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: imageUrl != null
-                                    ? Colors.transparent
-                                    : Colors.tealAccent,
-                                radius: 37.r,
-                                child: Padding(
-                                  padding: EdgeInsets.all(5.r),
-                                  child: Center(
-                                    child: imageUrl != null
-                                        ? Image.network(
-                                            imageUrl,
-                                            fit: BoxFit.cover,
+                          left: 32.w, top: 43.5.h, right: 32.w, bottom: 30.h),
+                      child: Screenshot(
+                        controller: _screenshotController,
+                        child: Container(
+                          color: Colors.white,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                left: 32.w,
+                                top: 43.5.h,
+                                right: 32.w,
+                                bottom: 30.h),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    imageUrl != null
+                                        ? ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(1000),
+                                            child: SizedBox(
+                                              width: 72.w,
+                                              height: 72.w,
+                                              child: FadeInImage.assetNetwork(
+                                                fit: BoxFit.cover,
+                                                placeholder:
+                                                    'assets/images/shimmer.gif',
+                                                image: imageUrl,
+                                              ),
+                                            ),
                                           )
-                                        : Image.asset(
-                                            'assets/images/logo_small.png',
+                                        : CircleAvatar(
+                                            backgroundColor: imageUrl != null
+                                                ? Colors.transparent
+                                                : Colors.tealAccent,
+                                            radius: 37.r,
+                                            child: Padding(
+                                              padding: EdgeInsets.all(5.r),
+                                              child: Center(
+                                                child: Image.asset(
+                                                  'assets/images/logo_small.png',
+                                                ),
+                                              ),
+                                            ),
                                           ),
+                                    SizedBox(width: 15.w),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(title,
+                                                style: GoogleFonts.notoSans(
+                                                  fontSize: 23.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  letterSpacing: -1.sp,
+                                                  height: 1.1,
+                                                )),
+                                            SizedBox(
+                                              width: 5.w,
+                                            ),
+                                            Container(
+                                              width: 25.w,
+                                              height: 25.w,
+                                              child: Image.asset(
+                                                  'assets/images/pngkit_twitter-png_189183.png'),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 6.h),
+                                        Text(
+                                          subtitle,
+                                          style: GoogleFonts.notoSans(
+                                              fontSize: 20.sp,
+                                              fontWeight: FontWeight.normal,
+                                              letterSpacing: -1.sp,
+                                              height: 1.1),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 18.h),
+                                Container(
+                                  height: 270.h,
+                                  width: 523.w,
+                                  child: Text(content,
+                                      style: GoogleFonts.notoSans(
+                                        fontSize: 25.sp,
+                                        letterSpacing: -1.13.sp,
+                                        height: 1.3,
+                                      ),
+                                      maxLines: 8,
+                                      overflow: TextOverflow.ellipsis),
+                                ),
+                                SizedBox(
+                                  height: 34.h,
+                                ),
+                                Text(
+                                  '${formatted}',
+                                  style: GoogleFonts.notoSans(
+                                    fontSize: 25.sp,
+                                    letterSpacing: -1.13.sp,
+                                    height: 1.1,
                                   ),
                                 ),
-                              ),
-                              SizedBox(width: 15.w),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
+                                SizedBox(
+                                  height: 12.h,
+                                ),
+                                Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 0.5.h,
+                                  color: Colors.black,
+                                ),
+                                SizedBox(
+                                  height: 12.h,
+                                ),
+                                Visibility(
+                                  visible: _clickedTodaySave,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      Text(title,
-                                          style: GoogleFonts.notoSans(
-                                            fontSize: 23.sp,
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: -1.sp,
-                                            height: 1.1,
+                                      GestureDetector(
+                                        onTap: () async {
+                                          final imageSave =
+                                              await _screenshotController
+                                                  .capture();
+                                          saveAndShare(imageSave);
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                                color: Color(0xFF707070)),
+                                          ),
+                                          width: 50.w,
+                                          height: 50.w,
+                                          child: Center(
+                                              child: Icon(
+                                            Icons.share_outlined,
+                                            size: 18,
                                           )),
+                                        ),
+                                      ),
                                       SizedBox(
-                                        width: 5.w,
+                                        width: 11.w,
                                       ),
-                                      Container(
-                                        width: 25.w,
-                                        height: 25.w,
-                                        child: Image.asset(
-                                            'assets/images/pngkit_twitter-png_189183.png'),
+                                      GestureDetector(
+                                        onTap: () async {
+                                          _clickedTodaySave = false;
+
+                                          setState(() {});
+
+                                          final imageSave =
+                                              await _screenshotController
+                                                  .capture();
+                                          if (imageSave == null) return;
+                                          await saveImage(imageSave);
+                                          await Future.delayed(
+                                              Duration(milliseconds: 500));
+                                          // .then((value) {
+
+                                          setState(() {
+                                            _clickedTodaySave = true;
+                                            print('!');
+                                          });
+                                          // });
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: Color(0xFF707070))),
+                                          width: 50.w,
+                                          height: 50.w,
+                                          child: Center(
+                                              child: Icon(
+                                                  Icons.file_download_outlined,
+                                                  size: 18)),
+                                        ),
                                       ),
+                                      SizedBox(
+                                        width: 12.w,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () async {
+                                          List<String> savedIds =
+                                              appData.getIdsOfSavedPost();
+
+                                          if (savedIds.contains(id) == false) {
+                                            log('not contains!');
+                                            appData.savedPost.add(Post(
+                                              id: id,
+                                              title: title,
+                                              subtitle: subtitle,
+                                              content: content,
+                                              imageUrl: imageUrl,
+                                            ));
+                                            List<String> ids =
+                                                appData.getIdsOfSavedPost();
+                                            localStorageController
+                                                .setSavedPostIds(ids);
+                                            setState(() {});
+                                          } else {
+                                            log('contains!');
+                                            log(appData.savedPost.length
+                                                .toString());
+                                            appData.savedPost.removeWhere(
+                                                (element) => element.id == id);
+                                            log(appData.savedPost.length
+                                                .toString());
+
+                                            List<String> ids =
+                                                appData.getIdsOfSavedPost();
+                                            localStorageController
+                                                .setSavedPostIds(ids);
+                                            setState(() {});
+                                          }
+                                          appData.update();
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                                color: Color(0xFF707070)),
+                                          ),
+                                          width: 50.w,
+                                          height: 50.h,
+                                          child: Center(
+                                              child: Icon(
+                                                  appData
+                                                          .getIdsOfSavedPost()
+                                                          .contains(id)
+                                                      ? Icons.bookmark_rounded
+                                                      : Icons
+                                                          .bookmark_border_outlined,
+                                                  size: 18)),
+                                        ),
+                                      )
                                     ],
                                   ),
-                                  SizedBox(height: 6.h),
-                                  Text(
-                                    subtitle,
-                                    style: GoogleFonts.notoSans(
-                                        fontSize: 20.sp,
-                                        fontWeight: FontWeight.normal,
-                                        letterSpacing: -1.sp,
-                                        height: 1.1),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 18.h),
-                          Container(
-                            height: 270.h,
-                            width: 523.w,
-                            child: Text(content,
-                                style: GoogleFonts.notoSans(
-                                  fontSize: 25.sp,
-                                  letterSpacing: -1.13.sp,
-                                  height: 1.3,
-                                ),
-                                maxLines: 8,
-                                overflow: TextOverflow.ellipsis),
-                          ),
-                          SizedBox(
-                            height: 34.h,
-                          ),
-                          Text(
-                            '${formatted}',
-                            style: GoogleFonts.notoSans(
-                              fontSize: 25.sp,
-                              letterSpacing: -1.13.sp,
-                              height: 1.1,
+                                )
+                              ],
                             ),
                           ),
-                          SizedBox(
-                            height: 12.h,
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 0.5.h,
-                            color: Colors.black,
-                          ),
-                          // Container(
-                          //     width: MediaQuery.of(context).size.width,
-                          //     child: Text(
-                          //       '${formatted}',
-                          //       style: GoogleFonts.notoSans(
-                          //         fontSize: 25.sp,
-                          //         letterSpacing: -1.13.sp,
-                          //         height: 1.1,
-                          //       ),
-                          //     ),
-                          //     decoration: const BoxDecoration(
-                          //       border: Border(
-                          //           bottom: BorderSide(color: Color(0xFF777777))),
-                          //     )),
-                          SizedBox(
-                            height: 12.h,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              GestureDetector(
-                                onTap: () async {
-                                  final imageSave =
-                                      await _screenshotController.capture();
-                                  saveAndShare(imageSave);
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    border:
-                                        Border.all(color: Color(0xFF707070)),
-                                  ),
-                                  width: 50.w,
-                                  height: 50.w,
-                                  child: Center(
-                                      child: Icon(
-                                    Icons.share_outlined,
-                                    size: 18,
-                                  )),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 11.w,
-                              ),
-                              GestureDetector(
-                                onTap: () async {
-                                  final imageSave =
-                                      await _screenshotController.capture();
-                                  if (imageSave == null) {}
-                                  await saveImage(imageSave);
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      shape: BoxShape.circle,
-                                      border:
-                                          Border.all(color: Color(0xFF707070))),
-                                  width: 50.w,
-                                  height: 50.w,
-                                  child: Center(
-                                      child: Icon(Icons.file_download_outlined,
-                                          size: 18)),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 12.w,
-                              ),
-                              GestureDetector(
-                                onTap: () async {
-                                  List<String> savedIds =
-                                      appData.getIdsOfSavedPost();
-
-                                  if (savedIds.contains(id) == false) {
-                                    log('not contains!');
-                                    appData.savedPost.add(Post(
-                                      id: id,
-                                      title: title,
-                                      subtitle: subtitle,
-                                      content: content,
-                                      imageUrl: imageUrl,
-                                    ));
-                                    List<String> ids =
-                                        appData.getIdsOfSavedPost();
-                                    localStorageController.setSavedPostIds(ids);
-                                    setState(() {});
-                                  } else {
-                                    log('contains!');
-                                    log(appData.savedPost.length.toString());
-                                    appData.savedPost.removeWhere(
-                                        (element) => element.id == id);
-                                    log(appData.savedPost.length.toString());
-
-                                    List<String> ids =
-                                        appData.getIdsOfSavedPost();
-                                    localStorageController.setSavedPostIds(ids);
-                                    setState(() {});
-                                  }
-                                  appData.update();
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    border:
-                                        Border.all(color: Color(0xFF707070)),
-                                  ),
-                                  width: 50.w,
-                                  height: 50.h,
-                                  child: Center(
-                                      child: Icon(
-                                          appData
-                                                  .getIdsOfSavedPost()
-                                                  .contains(id)
-                                              ? Icons.bookmark_rounded
-                                              : Icons.bookmark_border_outlined,
-                                          size: 18)),
-                                ),
-                              )
-                            ],
-                          )
-                        ],
+                        ),
                       ),
                     ),
-                    color: Colors.white),
-              );
-            }),
-      ),
+                  ),
+                  color: Colors.white),
+            );
+          }),
     );
   }
 
@@ -1179,236 +1257,276 @@ class _TodayScreenState extends State<TodayScreen>
               Container(
                 decoration:
                     BoxDecoration(borderRadius: BorderRadius.circular(15.0.r)),
-                width: 654.w,
-                height: 654.w,
-                child: Screenshot(
-                  controller: _lastScreenshotController,
-                  child: Card(
-                      shape: RoundedRectangleBorder(
+                width: 660.w,
+                height: 660.w,
+                child: Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(36.r)),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(36.r)),
                       child: Padding(
                         padding: EdgeInsets.only(
-                            left: 64.w, top: 87.h, right: 64.w, bottom: 60.h),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: post.imageUrl != null
-                                      ? Colors.transparent
-                                      : Colors.tealAccent,
-                                  radius: 37.r,
-                                  child: Padding(
-                                    padding: EdgeInsets.all(5.r),
-                                    child: Center(
-                                      child: post.imageUrl != null
-                                          ? Image.network(
-                                              post.imageUrl.toString(),
-                                              fit: BoxFit.cover,
+                            left: 32.w, top: 43.5.h, right: 32.w, bottom: 30.h),
+                        child: Screenshot(
+                          controller: _lastScreenshotController,
+                          child: Container(
+                            color: Colors.white,
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  left: 32.w,
+                                  top: 43.5.h,
+                                  right: 32.w,
+                                  bottom: 30.h),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      post.imageUrl != null
+                                          ? ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(1000),
+                                              child: SizedBox(
+                                                width: 72.w,
+                                                height: 72.w,
+                                                child: FadeInImage.assetNetwork(
+                                                  fit: BoxFit.cover,
+                                                  placeholder:
+                                                      'assets/images/shimmer.gif',
+                                                  image:
+                                                      post.imageUrl.toString(),
+                                                ),
+                                              ),
                                             )
-                                          : Image.asset(
-                                              'assets/images/logo_small.png',
+                                          : CircleAvatar(
+                                              backgroundColor:
+                                                  post.imageUrl != null
+                                                      ? Colors.transparent
+                                                      : Colors.tealAccent,
+                                              radius: 37.r,
+                                              child: Padding(
+                                                padding: EdgeInsets.all(5.r),
+                                                child: Center(
+                                                  child: post.imageUrl != null
+                                                      ? Image.network(
+                                                          post.imageUrl
+                                                              .toString(),
+                                                          fit: BoxFit.cover,
+                                                        )
+                                                      : Image.asset(
+                                                          'assets/images/logo_small.png',
+                                                        ),
+                                                ),
+                                              ),
                                             ),
+                                      SizedBox(width: 15.w),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                post.title.toString(),
+                                                style: GoogleFonts.notoSans(
+                                                    fontSize: 23.sp,
+                                                    fontWeight: FontWeight.bold,
+                                                    letterSpacing: -1.sp,
+                                                    height: 1.1),
+                                              ),
+                                              SizedBox(
+                                                width: 5.w,
+                                              ),
+                                              Container(
+                                                width: 25.w,
+                                                height: 25.w,
+                                                child: Image.asset(
+                                                    'assets/images/pngkit_twitter-png_189183.png'),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 6.h),
+                                          Text(
+                                            post.subtitle.toString(),
+                                            style: GoogleFonts.notoSans(
+                                                fontSize: 20.sp,
+                                                fontWeight: FontWeight.normal,
+                                                letterSpacing: -1.sp,
+                                                height: 1.2),
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                  SizedBox(height: 18.h),
+                                  Container(
+                                    height: 270.h,
+                                    width: 523.w,
+                                    child: Text(post.content.toString(),
+                                        style: GoogleFonts.notoSans(
+                                            fontSize: 25.sp,
+                                            letterSpacing: -1.13.sp,
+                                            height: 1.3),
+                                        maxLines: 8,
+                                        overflow: TextOverflow.ellipsis),
+                                  ),
+                                  SizedBox(
+                                    height: 34.h,
+                                  ),
+                                  Text(
+                                    '${formattedPostId}',
+                                    style: GoogleFonts.notoSans(
+                                      fontSize: 25.sp,
+                                      letterSpacing: -1.13.sp,
+                                      height: 1.1,
                                     ),
                                   ),
-                                ),
-                                SizedBox(width: 15.w),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
+                                  SizedBox(
+                                    height: 12.h,
+                                  ),
+                                  Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    height: 0.5.h,
+                                    color: Colors.black,
+                                  ),
+                                  SizedBox(
+                                    height: 12.h,
+                                  ),
+                                  Visibility(
+                                    visible: _clickedLastSave,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
-                                        Text(
-                                          post.title.toString(),
-                                          style: GoogleFonts.notoSans(
-                                              fontSize: 23.sp,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: -1.sp,
-                                              height: 1.1),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            final imageSave =
+                                                await _lastScreenshotController
+                                                    .capture();
+                                            saveAndShare(imageSave);
+                                          },
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: Color(0xFF707070)),
+                                            ),
+                                            width: 50.w,
+                                            height: 50.h,
+                                            child: Center(
+                                              child: Icon(Icons.share_outlined,
+                                                  size: 18),
+                                            ),
+                                          ),
                                         ),
                                         SizedBox(
-                                          width: 5.w,
+                                          width: 11.w,
                                         ),
-                                        Container(
-                                          width: 25.w,
-                                          height: 25.w,
-                                          child: Image.asset(
-                                              'assets/images/pngkit_twitter-png_189183.png'),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            _clickedLastSave =
+                                                !_clickedLastSave;
+                                            setState(() {});
+                                            final imageSave =
+                                                await _lastScreenshotController
+                                                    .capture();
+                                            if (imageSave == null) {}
+                                            await saveImage(imageSave);
+                                            _clickedLastSave =
+                                                !_clickedLastSave;
+                                            setState(() {});
+                                          },
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                    color: Color(0xFF707070))),
+                                            width: 50.w,
+                                            height: 50.w,
+                                            child: Center(
+                                                child: Icon(
+                                                    Icons
+                                                        .file_download_outlined,
+                                                    size: 18)),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 11.w,
+                                        ),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            List<String> savedIds =
+                                                appData.getIdsOfSavedPost();
+
+                                            if (savedIds.contains(post.id) ==
+                                                false) {
+                                              log('not contains!');
+                                              appData.savedPost.add(Post(
+                                                id: post.id,
+                                                title: post.title,
+                                                subtitle: post.subtitle,
+                                                content: post.content,
+                                                imageUrl: post.imageUrl,
+                                              ));
+                                              List<String> ids =
+                                                  appData.getIdsOfSavedPost();
+                                              localStorageController
+                                                  .setSavedPostIds(ids);
+                                              setState(() {});
+                                            } else {
+                                              log('contains!');
+                                              log(appData.savedPost.length
+                                                  .toString());
+                                              appData.savedPost.removeWhere(
+                                                  (element) =>
+                                                      element.id == post.id);
+                                              log(appData.savedPost.length
+                                                  .toString());
+
+                                              List<String> ids =
+                                                  appData.getIdsOfSavedPost();
+                                              localStorageController
+                                                  .setSavedPostIds(ids);
+
+                                              _isSelected = !_isSelected;
+                                              setState(() {});
+                                            }
+                                            appData.update();
+                                          },
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: Color(0xFF707070)),
+                                            ),
+                                            width: 50.w,
+                                            height: 50.w,
+                                            child: Center(
+                                                child: Icon(
+                                                    appData
+                                                            .getIdsOfSavedPost()
+                                                            .contains(post.id)
+                                                        ? Icons.bookmark_rounded
+                                                        : Icons
+                                                            .bookmark_outline_outlined,
+                                                    size: 18)),
+                                          ),
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: 6.h),
-                                    Text(
-                                      post.subtitle.toString(),
-                                      style: GoogleFonts.notoSans(
-                                          fontSize: 20.sp,
-                                          fontWeight: FontWeight.normal,
-                                          letterSpacing: -1.sp,
-                                          height: 1.2),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(height: 18.h),
-                            Container(
-                              height: 270.h,
-                              width: 523.w,
-                              child: Text(post.content.toString(),
-                                  style: GoogleFonts.notoSans(
-                                      fontSize: 25.sp,
-                                      letterSpacing: -1.13.sp,
-                                      height: 1.3),
-                                  maxLines: 8,
-                                  overflow: TextOverflow.ellipsis),
-                            ),
-                            SizedBox(
-                              height: 34.h,
-                            ),
-                            Text(
-                              '${formattedPostId}',
-                              style: GoogleFonts.notoSans(
-                                fontSize: 25.sp,
-                                letterSpacing: -1.13.sp,
-                                height: 1.1,
+                                  )
+                                ],
                               ),
                             ),
-                            SizedBox(
-                              height: 12.h,
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: 0.5.h,
-                              color: Colors.black,
-                            ),
-                            // Container(
-                            //     width: MediaQuery.of(context).size.width,
-                            //     child: Text(formattedPostId),
-                            //     decoration: const BoxDecoration(
-                            //       border: Border(
-                            //           bottom:
-                            //               BorderSide(color: Color(0xFF777777))),
-                            //     )),
-                            SizedBox(
-                              height: 12.h,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                GestureDetector(
-                                  onTap: () async {
-                                    final imageSave =
-                                        await _lastScreenshotController
-                                            .capture();
-                                    saveAndShare(imageSave);
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      shape: BoxShape.circle,
-                                      border:
-                                          Border.all(color: Color(0xFF707070)),
-                                    ),
-                                    width: 50.w,
-                                    height: 50.h,
-                                    child: Center(
-                                      child:
-                                          Icon(Icons.share_outlined, size: 18),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 11.w,
-                                ),
-                                GestureDetector(
-                                  onTap: () async {
-                                    final imageSave =
-                                        await _lastScreenshotController
-                                            .capture();
-                                    if (imageSave == null) {}
-                                    await saveImage(imageSave);
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                            color: Color(0xFF707070))),
-                                    width: 50.w,
-                                    height: 50.w,
-                                    child: Center(
-                                        child: Icon(
-                                            Icons.file_download_outlined,
-                                            size: 18)),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 11.w,
-                                ),
-                                GestureDetector(
-                                  onTap: () async {
-                                    List<String> savedIds =
-                                        appData.getIdsOfSavedPost();
-
-                                    if (savedIds.contains(post.id) == false) {
-                                      log('not contains!');
-                                      appData.savedPost.add(Post(
-                                        id: post.id,
-                                        title: post.title,
-                                        subtitle: post.subtitle,
-                                        content: post.content,
-                                        imageUrl: post.imageUrl,
-                                      ));
-                                      List<String> ids =
-                                          appData.getIdsOfSavedPost();
-                                      localStorageController
-                                          .setSavedPostIds(ids);
-                                      setState(() {});
-                                    } else {
-                                      log('contains!');
-                                      log(appData.savedPost.length.toString());
-                                      appData.savedPost.removeWhere(
-                                          (element) => element.id == post.id);
-                                      log(appData.savedPost.length.toString());
-
-                                      List<String> ids =
-                                          appData.getIdsOfSavedPost();
-                                      localStorageController
-                                          .setSavedPostIds(ids);
-
-                                      _isSelected = !_isSelected;
-                                      setState(() {});
-                                    }
-                                    appData.update();
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      shape: BoxShape.circle,
-                                      border:
-                                          Border.all(color: Color(0xFF707070)),
-                                    ),
-                                    width: 50.w,
-                                    height: 50.w,
-                                    child: Center(
-                                        child: Icon(
-                                            appData
-                                                    .getIdsOfSavedPost()
-                                                    .contains(post.id)
-                                                ? Icons.bookmark_rounded
-                                                : Icons
-                                                    .bookmark_outline_outlined,
-                                            size: 18)),
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
+                          ),
                         ),
                       ),
-                      color: Colors.white),
-                ),
+                    ),
+                    color: Colors.white),
               ),
             ],
           ),
@@ -1480,25 +1598,40 @@ class _TodayScreenState extends State<TodayScreen>
                           children: [
                             Row(
                               children: [
-                                CircleAvatar(
-                                  backgroundColor: imageUrl != null
-                                      ? Colors.transparent
-                                      : Colors.tealAccent,
-                                  radius: 37.r,
-                                  child: Padding(
-                                    padding: EdgeInsets.all(5.r),
-                                    child: Center(
-                                      child: imageUrl != null
-                                          ? Image.network(
-                                              imageUrl,
-                                              fit: BoxFit.cover,
-                                            )
-                                          : Image.asset(
-                                              'assets/images/logo_small.png',
-                                            ),
-                                    ),
-                                  ),
-                                ),
+                                imageUrl != null
+                                    ? ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(1000),
+                                        child: SizedBox(
+                                          width: 72.w,
+                                          height: 72.w,
+                                          child: FadeInImage.assetNetwork(
+                                            fit: BoxFit.cover,
+                                            placeholder:
+                                                'assets/images/shimmer.gif',
+                                            image: imageUrl,
+                                          ),
+                                        ),
+                                      )
+                                    : CircleAvatar(
+                                        backgroundColor: imageUrl != null
+                                            ? Colors.transparent
+                                            : Colors.tealAccent,
+                                        radius: 37.r,
+                                        child: Padding(
+                                          padding: EdgeInsets.all(5.r),
+                                          child: Center(
+                                            child: imageUrl != null
+                                                ? Image.network(
+                                                    imageUrl,
+                                                    fit: BoxFit.cover,
+                                                  )
+                                                : Image.asset(
+                                                    'assets/images/logo_small.png',
+                                                  ),
+                                          ),
+                                        ),
+                                      ),
                                 SizedBox(width: 15.w),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1712,6 +1845,22 @@ class _TodayScreenState extends State<TodayScreen>
     final time = DateTime.now().toIso8601String();
     final name = 'screenShot_$time';
     final result = await ImageGallerySaver.saveImage(bytes!, name: name);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '갤러리에 저장되었습니다.',
+        ),
+        action: SnackBarAction(
+            label: 'OK',
+            textColor: Colors.white,
+            onPressed: () {
+              ScaffoldMessenger.of(context).clearSnackBars();
+            }),
+      ),
+    );
+
+    return '';
 
     return result['filePath'];
   }
