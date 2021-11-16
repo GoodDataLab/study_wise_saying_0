@@ -21,8 +21,11 @@ import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:screenshot/screenshot.dart';
+import 'package:study_wise_saying/controllers/dynamic_link_controller.dart';
 import 'package:study_wise_saying/controllers/local_storage_controller.dart';
+import 'package:study_wise_saying/handlers/link_share_handler.dart';
 import 'package:study_wise_saying/model/post.dart';
+import 'package:study_wise_saying/screens/screen_by_dynamic_link.dart';
 import '../common_import.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:card_swiper/card_swiper.dart';
@@ -36,10 +39,13 @@ class TodayScreen extends StatefulWidget {
 }
 
 class _TodayScreenState extends State<TodayScreen>
-    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+    with
+        SingleTickerProviderStateMixin,
+        AutomaticKeepAliveClientMixin,
+        WidgetsBindingObserver {
   AppData appData = Get.find();
 
-  bool administrator = true;
+  bool administrator = false;
   TabController? _tabController;
   final int _currentIndex = 0;
   bool _isSelected = false;
@@ -63,6 +69,7 @@ class _TodayScreenState extends State<TodayScreen>
   int? diff;
   Post? _selectedPost;
   Post? _myselectedPost;
+  Timer? _timerLink;
 
   final Stream<QuerySnapshot>? _postStream = FirebaseFirestore.instance
       .collection('post')
@@ -91,7 +98,10 @@ class _TodayScreenState extends State<TodayScreen>
     _goalEditingController = TextEditingController(text: initGoal);
 
     admobController.initBannerAd();
-    admobController.initMediumRectangleAd();
+    admobController.initInterstitialAd();
+
+    dynamicLinkController.handleRouteFromDynamicLink();
+    WidgetsBinding.instance!.addObserver(this);
 
     super.initState();
   }
@@ -100,8 +110,25 @@ class _TodayScreenState extends State<TodayScreen>
   void dispose() {
     _tabController!.dispose();
     _goalEditingController?.dispose();
+    //admobController.initInterstitialAd().dispose();
+    WidgetsBinding.instance!.removeObserver(this);
+    if (_timerLink != null) {
+      _timerLink?.cancel();
+    }
 
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _timerLink = new Timer(
+        const Duration(milliseconds: 300),
+        () {
+          dynamicLinkController.handleRouteFromDynamicLink();
+        },
+      );
+    }
   }
 
   @override
@@ -110,6 +137,7 @@ class _TodayScreenState extends State<TodayScreen>
     return GetBuilder(
       builder: (AppData appData) => WillPopScope(
         onWillPop: () {
+          //admobController.createInterstitialAd();
           showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -129,7 +157,7 @@ class _TodayScreenState extends State<TodayScreen>
           ),
           backgroundColor: kBackgroundColor,
           //앱 하단부에 배너 광고 표시
-          bottomNavigationBar: AdsBottom(),
+          //bottomNavigationBar: AdsBottom(),
           body: Column(
             children: [
               Container(
@@ -607,10 +635,17 @@ class _TodayScreenState extends State<TodayScreen>
                                       children: [
                                         GestureDetector(
                                           onTap: () async {
-                                            final imageSave =
-                                                await _myScreenshotController
-                                                    .capture();
-                                            saveAndShare(imageSave);
+                                            try {
+                                              log('!' + (post.id ?? 'null'));
+                                              await linkShareHandler
+                                                  .makeLinkAndShare(
+                                                postId: post.id!,
+                                                title: post.content!,
+                                                content: post.title!,
+                                              );
+                                            } catch (e) {
+                                              log(e.toString());
+                                            }
                                           },
                                           child: Container(
                                             decoration: BoxDecoration(
@@ -832,6 +867,10 @@ class _TodayScreenState extends State<TodayScreen>
                                           DateFormat('yyyy-MM-dd')
                                               .format(args.value)
                                               .toString();
+                                      if (args.value == null) {
+                                        appData.currentSelectedDay =
+                                            appData.currentNow.toString();
+                                      }
                                     });
                                   }),
                             ),
@@ -877,24 +916,18 @@ class _TodayScreenState extends State<TodayScreen>
 
                                           appData.currentNow = DateTime(
                                               now.year, now.month, now.day);
-
-                                          appData.currentDDay =
-                                              _dateRangePickerController
-                                                  .selectedDate!
-                                                  .difference(
-                                                      appData.currentNow!)
-                                                  .inDays;
-
-                                          print(appData.currentNow);
-                                          print(appData.currentDDay);
-                                          print(appData.currentSelectedDay
-                                              .toString());
-
-                                          // SharedPreferences _prefsDDay =
-                                          //     await SharedPreferences
-                                          //         .getInstance();
-                                          // _prefsDDay.setInt(
-                                          //     'dDay', appData.currentDDay!);
+                                          if (_dateRangePickerController
+                                                  .selectedDate !=
+                                              null) {
+                                            appData.currentDDay =
+                                                _dateRangePickerController
+                                                    .selectedDate!
+                                                    .difference(
+                                                        appData.currentNow!)
+                                                    .inDays;
+                                          } else {
+                                            appData.currentDDay == null;
+                                          }
 
                                           Get.back();
                                         },
@@ -935,14 +968,12 @@ class _TodayScreenState extends State<TodayScreen>
             }
             if (!snapshot.hasData) return Container();
 
-            // print(snapshot);
-            // print(snapshot.data);
-            // print(snapshot.data!.data());
-
             if (snapshot.data?.data() == null) {
-              // print('null data');
               return Center(
-                child: Text('오늘은 명언이 없습니다.'),
+                child: Text(
+                  '오늘은 명언이 없습니다.',
+                  style: TextStyle(fontSize: 25.sp),
+                ),
               );
             }
 
@@ -952,7 +983,8 @@ class _TodayScreenState extends State<TodayScreen>
                 (snapshot.data!.data() as Map<String, dynamic>)['subtitle'];
             String content =
                 (snapshot.data!.data() as Map<String, dynamic>)['content'];
-            String id = (snapshot.data!.data() as Map<String, dynamic>)['id'];
+            String id =
+                (snapshot.data!.data() as Map<String, dynamic>)['id'] ?? '';
             String? imageUrl =
                 (snapshot.data!.data() as Map<String, dynamic>)['imageUrl'];
 
@@ -1101,10 +1133,17 @@ class _TodayScreenState extends State<TodayScreen>
                                     children: [
                                       GestureDetector(
                                         onTap: () async {
-                                          final imageSave =
-                                              await _screenshotController
-                                                  .capture();
-                                          saveAndShare(imageSave);
+                                          try {
+                                            log('!' + (id));
+                                            await linkShareHandler
+                                                .makeLinkAndShare(
+                                              postId: id,
+                                              title: content,
+                                              content: title,
+                                            );
+                                          } catch (e) {
+                                            log(e.toString());
+                                          }
                                         },
                                         child: Container(
                                           decoration: BoxDecoration(
@@ -1142,7 +1181,6 @@ class _TodayScreenState extends State<TodayScreen>
 
                                           setState(() {
                                             _clickedTodaySave = true;
-                                            print('!');
                                           });
                                           // });
                                         },
@@ -1401,10 +1439,17 @@ class _TodayScreenState extends State<TodayScreen>
                                       children: [
                                         GestureDetector(
                                           onTap: () async {
-                                            final imageSave =
-                                                await _lastScreenshotController
-                                                    .capture();
-                                            saveAndShare(imageSave);
+                                            try {
+                                              log('!' + (post.id ?? 'null'));
+                                              await linkShareHandler
+                                                  .makeLinkAndShare(
+                                                postId: post.id!,
+                                                title: post.content!,
+                                                content: post.title!,
+                                              );
+                                            } catch (e) {
+                                              log(e.toString());
+                                            }
                                           },
                                           child: Container(
                                             decoration: BoxDecoration(
@@ -1541,7 +1586,6 @@ class _TodayScreenState extends State<TodayScreen>
           stream: _postStream,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              print(snapshot.error);
               return Container();
             }
             if (!snapshot.hasData) return Container();
@@ -1892,58 +1936,62 @@ class ExitApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StatefulBuilder(
-        builder: (BuildContext context, StateSetter stateSetter) {
-      return Container(
-          decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(36.r)),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: SizedBox(
-                  // height:
-                  //     admobController.mediumRectangleAd.size.height.toDouble(),
-                  child: admobController.createMediumAd(),
+    return Dialog(
+      //insetPadding: EdgeInsets.symmetric(vertical: 50.h),
+      child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter stateSetter) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(top: 150.h),
+              child: Material(
+                  child: Text('앱을 종료 하시겠습니까?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: 40.sp, fontWeight: FontWeight.bold))),
+            ),
+            SizedBox(
+              height: 150.h,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 100.h,
+                    decoration: const BoxDecoration(
+                        border: Border(
+                            top: BorderSide(color: Color(0xFF777777)),
+                            right: BorderSide(color: Color(0xFF777777)))),
+                    child: TextButton(
+                        onPressed: () {
+                          admobController.initInterstitialAd();
+                          Get.back();
+                        },
+                        child: const Text(
+                          '취소',
+                        )),
+                  ),
                 ),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 100.h,
-                      decoration: const BoxDecoration(
-                          border: Border(
-                              top: BorderSide(color: Color(0xFF777777)),
-                              right: BorderSide(color: Color(0xFF777777)))),
-                      child: TextButton(
-                          onPressed: () {
-                            Get.back();
-                          },
-                          child: const Text(
-                            '취소',
-                          )),
-                    ),
+                Expanded(
+                  child: Container(
+                    height: 100.h,
+                    decoration: const BoxDecoration(
+                        border:
+                            Border(top: BorderSide(color: Color(0xFF777777)))),
+                    child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context, true);
+                          SystemNavigator.pop();
+                        },
+                        child: const Text('종료')),
                   ),
-                  Expanded(
-                    child: Container(
-                      height: 100.h,
-                      decoration: const BoxDecoration(
-                          border: Border(
-                              top: BorderSide(color: Color(0xFF777777)))),
-                      child: TextButton(
-                          onPressed: () {
-                            Navigator.pop(context, true);
-                            SystemNavigator.pop();
-                          },
-                          child: const Text('종료')),
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ));
-    });
+                ),
+              ],
+            )
+          ],
+        );
+      }),
+    );
   }
 }

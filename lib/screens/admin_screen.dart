@@ -114,7 +114,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     child: Container(
                         child: GestureDetector(
                           onTap: () {
-                            print('!KM!KN');
+                           
                             getImageFromGallery();
                           },
                           child: _image == null

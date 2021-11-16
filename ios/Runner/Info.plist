@@ -20,22 +20,35 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>Bundle ID</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.gooddatalab.studyWiseSaying</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-6982016124752185~3417774404</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Used to Location's Info always for Using App.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Used to Location's Info always for Using App.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Used to Location's Info for Using Beacon when In Use.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>명언 이미지를 앨범에 저장하기 위해 권한이 필요합니다.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>명언 이미지를 앨범에 저장하기 위해 권한이 필요합니다.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Used to Location&apos;s Info always for Using Beacon.</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Used to Location&apos;s Info always for Using Beacon.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Used to Location&apos;s Info for Using Beacon when In Use.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>

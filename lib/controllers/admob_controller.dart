@@ -4,11 +4,12 @@ AdmobController admobController = AdmobController();
 
 class AdmobController {
   late BannerAd _bannerAd;
-  late BannerAd _mediumRectangleAd;
+  //late BannerAd _exitBannerAd;
+  InterstitialAd? _interstitialAd;
   // late InterstitialAd? _interstitialAd;
-  // late NativeAd _nativeAd;
+  //late NativeAd _nativeAd;
 
-  BannerAd get mediumRectangleAd => _mediumRectangleAd;
+  //InterstitialAd get mediumRectangleAd => _interstitialAd;
 
   initMobileAds() {
     MobileAds.instance.initialize();
@@ -23,6 +24,15 @@ class AdmobController {
       ..load();
   }
 
+  // initExitBannerAd() {
+  //   _exitBannerAd = BannerAd(
+  //       size: AdSize.mediumRectangle,
+  //       adUnitId: 'ca-app-pub-6982016124752185/9417050435',
+  //       listener: BannerAdListener(),
+  //       request: AdRequest())
+  //     ..load();
+  // }
+
   // initNativeAd() {
   //   _nativeAd = NativeAd(
   //       adUnitId: NativeAd.testAdUnitId,
@@ -32,29 +42,50 @@ class AdmobController {
   //     ..load();
   // }
 
-  initMediumRectangleAd() {
-    _mediumRectangleAd = BannerAd(
-        size: AdSize.mediumRectangle,
-        adUnitId: BannerAd.testAdUnitId,
-        listener: BannerAdListener(),
-        request: AdRequest())
-      ..load();
+  initInterstitialAd() {
+    return InterstitialAd.load(
+        adUnitId: InterstitialAd.testAdUnitId,
+        request: AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (InterstitialAd ad) {
+            // Keep a reference to the ad so you can show it later.
+            this._interstitialAd = ad;
+          },
+          onAdFailedToLoad: (LoadAdError error) {
+            print('InterstitialAd failed to load: $error');
+          },
+        ));
   }
 
-  // initIntertitialAd() {
-  //   _interstitialAd = InterstitialAd.
-  // }
-  // createNativeAd() {
-  //   return AdWidget(ad: _nativeAd);
-  // }
-
-  createMediumAd() {
-    return AdWidget(
-      ad: _mediumRectangleAd,
-    );
+  createInterstitialAd() {
+    _interstitialAd?.show();
   }
+
+  // fullScreenEvent() {
+  //   _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+  //     onAdShowedFullScreenContent: (InterstitialAd ad) =>
+  //         print('$ad onAdShowedFullScreenContent.'),
+  //     onAdDismissedFullScreenContent: (InterstitialAd ad) {
+  //       print('$ad onAdDismissedFullScreenContent.');
+  //       ad.dispose();
+  //     },
+  //     onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+  //       print('$ad onAdFailedToShowFullScreenContent: $error');
+  //       ad.dispose();
+  //     },
+  //     onAdImpression: (InterstitialAd ad) => print('$ad impression occurred.'),
+  //   );
+  // }
 
   createBannerAd() {
     return AdWidget(ad: _bannerAd);
   }
+
+  // createExitBannerAd() {
+  //   return AdWidget(ad: _interstitialAd);
+  // }
+
+  // createNativeAd() {
+  //   return AdWidget(ad: _nativeAd);
+  // }
 }

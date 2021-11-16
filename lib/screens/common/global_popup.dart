@@ -12,8 +12,8 @@ showCustomToast(String message) {
   );
 }
 
-showCustomCupertinoAlert(String message) {
-  Get.dialog(
+Future<void> showCustomCupertinoAlert(String message) async {
+  await Get.dialog(
     AlertDialog(
       contentPadding:
           EdgeInsets.only(top: 32.h, bottom: 0.h, left: 20.w, right: 20.w),
