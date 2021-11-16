@@ -14,6 +14,51 @@
       },
       "oauth_client": [
         {
+          "client_id": "21234871773-ccf05ki31bftk9hgujg9vrq8p6kddnok.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gooddatalab.studyWiseSaying",
+            "certificate_hash": "cb69a7f1ed6286f69ebcb3f84331265a4d8ee06c"
+          }
+        },
+        {
+          "client_id": "21234871773-f34qpmid1vfa4fc2dm8jcm1v08pp2o4u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_9PCOsCEA-sZmRRk-8fI_BaBINMEllcU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "21234871773-f34qpmid1vfa4fc2dm8jcm1v08pp2o4u.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "21234871773-v53333ehg1imrqt3pki35rtg0ub2un5k.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gooddatalab.studyWiseSaying"
+              }
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-6982016124752185~3254122874"
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:21234871773:android:5f99ff5ab1616c660c1a34",
+        "android_client_info": {
+          "package_name": "com.gooddatalab.studyWiseSayingAndroid"
+        }
+      },
+      "oauth_client": [
+        {
           "client_id": "21234871773-f34qpmid1vfa4fc2dm8jcm1v08pp2o4u.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -1,4 +1,4 @@
-package com.gooddatalab.studyWiseSaying
+package com.gooddatalab.studyWiseSayingAndroid
 
 import io.flutter.embedding.android.FlutterActivity
 

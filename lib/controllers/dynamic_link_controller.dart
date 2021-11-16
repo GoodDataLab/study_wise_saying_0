@@ -12,7 +12,7 @@ final dynamicLinkPostKeyword = 'postLink';
 
 class DynamicLinkController {
   final dynamicLinkPrefix = 'https://gongmyeong.page.link';
-  final androidPackageName = 'com.gooddatalab.studyWiseSaying';
+  final androidPackageName = 'com.gooddatalab.studyWiseSayingAndroid';
   final iosPackageName = 'com.gooddatalab.studyWiseSaying';
   final iosAppstroeId = ''; // todo
   final defaultInvitationImageUrl =
