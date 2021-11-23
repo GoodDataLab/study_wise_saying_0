@@ -76,9 +76,7 @@ class _OnBoarding2State extends State<OnBoarding2> {
                     duration: Duration(seconds: 1),
                     child: Container(
                       child: Image.asset(
-                        'assets/images/focus1.gif',
-                        //width: 300.w,
-                        //height: 300.h,
+                        'assets/images/first.gif',
                       ),
                       decoration: BoxDecoration(
                           boxShadow: [
@@ -90,8 +88,8 @@ class _OnBoarding2State extends State<OnBoarding2> {
                           ],
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(36.r)),
-                      width: 572.w,
-                      height: 509.h,
+                      // width: 572.w,
+                      // height: 509.h,
                     ),
                   ),
                 ],

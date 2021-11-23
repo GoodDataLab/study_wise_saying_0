@@ -72,22 +72,22 @@ class _OnBoarding4State extends State<OnBoarding4> {
                     duration: Duration(seconds: 1),
                     child: Container(
                       child: Image.asset(
-                        'assets/images/focus1.gif',
-                        //width: 300.w,
-                        //height: 300.h,
+                        'assets/images/third.gif',
+                        fit: BoxFit.fitHeight,
                       ),
                       decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.black.withOpacity(.1),
-                                blurRadius: 5.0,
-                                spreadRadius: 3.0,
-                                offset: Offset(5.0, 5.0)),
-                          ],
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(36.r)),
-                      width: 572.w,
-                      height: 509.h,
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withOpacity(.1),
+                              blurRadius: 5.0,
+                              spreadRadius: 3.0,
+                              offset: Offset(5.0, 5.0)),
+                        ],
+                        color: Colors.white,
+                        //borderRadius: BorderRadius.circular(36.r),
+                      ),
+                      // width: 572.w,
+                      // height: 509.h,
                     ),
                   ),
                 ],

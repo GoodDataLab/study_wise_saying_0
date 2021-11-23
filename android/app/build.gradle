@@ -74,6 +74,12 @@ android {
             signingConfig signingConfigs.release
         }
     }
+    lintOptions{
+        lintOptions{
+            disable 'InvalidPackage'
+            checkReleaseBuilds false
+        }
+    }
     
 }
 

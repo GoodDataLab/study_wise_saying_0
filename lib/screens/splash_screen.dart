@@ -76,7 +76,8 @@ class _SplashScreenState extends State<SplashScreen> {
     String? selectedDate = instance.getString('selectedDate');
     DateTime today = DateTime.now();
 
-    bool isStarted = instance.getBool('isStarted') ?? false;
+    //bool isStarted = instance.getBool('isStarted') ?? false;
+    bool isStarted = false;
     bool myPostId = instance.getBool('myPostId') ?? false;
     List<String> savedIds = await localStorageController.getSavedPostIds();
     appData.updateSavedPostsByIds(savedIds);
