@@ -14,7 +14,7 @@ class DynamicLinkController {
   final dynamicLinkPrefix = 'https://gongmyeong.page.link';
   final androidPackageName = 'com.gooddatalab.studyWiseSayingAndroid';
   final iosPackageName = 'com.gooddatalab.studyWiseSaying';
-  final iosAppstroeId = ''; // todo
+  final iosAppstroeId = '1592030491'; // todo
   final defaultInvitationImageUrl =
       'https://firebasestorage.googleapis.com/v0/b/study-wisesaying.appspot.com/o/appicon%2Fappstore.png?alt=media&token=e1834944-44a8-4d14-8c7f-83ba00984564';
 
@@ -92,7 +92,7 @@ class DynamicLinkController {
         if (dataMap[dynamicLinkPostKeyword] != null) {
           String postId = dataMap[dynamicLinkPostKeyword]!;
           Get.to(() => ScreenByDynamicLink(postId: postId));
-        }
+        } else {}
       }
     }
   }

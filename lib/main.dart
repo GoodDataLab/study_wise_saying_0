@@ -12,7 +12,7 @@ void main() async {
   await Firebase.initializeApp();
   admobController.initMobileAds;
   await NotificationService().init();
-  print('!@#');
+  //print('!@#');
   //runApp(
   // DevicePreview(enabled: !kReleaseMode, builder: (context) => App()),
   // Wrap your app

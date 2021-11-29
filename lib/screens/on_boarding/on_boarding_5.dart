@@ -48,7 +48,7 @@ class _OnBoarding5State extends State<OnBoarding5> {
                     child: FadeIn(
                       duration: Duration(seconds: 3),
                       child: Text(
-                        '우측하단에 북마크를 활용하여\n나의 공명을 만들어보세요',
+                        '우측하단에 북마크를 활용하여\n나의 공명을 만들어보세요.',
                         style: TextStyle(
                           fontSize: 35.sp,
                           letterSpacing: -2.63.sp,
@@ -61,27 +61,31 @@ class _OnBoarding5State extends State<OnBoarding5> {
                   FadeIn(
                     duration: Duration(seconds: 1),
                     child: Container(
-                      child: Image.asset(
-                        'assets/images/fourth.gif',
-                        //width: 300.w,
-                        //height: 300.h,
+                      child: ClipRRect(
+                        child: Image.asset(
+                          'assets/images/jjal_04.gif',
+                          fit: BoxFit.cover,
+                          //width: 300.w,
+                          //height: 300.h,
+                        ),
+                        borderRadius: BorderRadius.circular(36.r),
                       ),
                       decoration: BoxDecoration(
                         boxShadow: [
                           BoxShadow(
                               color: Colors.black.withOpacity(.1),
-                              blurRadius: 5.0,
+                              blurRadius: 3.0,
                               spreadRadius: 3.0,
                               offset: Offset(5.0, 5.0)),
                         ],
                         color: Colors.white,
-                        //borderRadius: BorderRadius.circular(36.r),
+                        borderRadius: BorderRadius.circular(36.r),
                       ),
-                      // width: 572.w,
-                      // height: 509.h,
+                      width: 572.w,
+                      height: 509.h,
                     ),
                   ),
-                  SizedBox(height: 270.h),
+                  SizedBox(height: 230.h),
                   FadeIn(
                     duration: Duration(seconds: 2),
                     child: Padding(
@@ -91,9 +95,9 @@ class _OnBoarding5State extends State<OnBoarding5> {
                         height: 79.h,
                         decoration: BoxDecoration(boxShadow: [
                           BoxShadow(
-                              color: Colors.black.withOpacity(.2),
-                              blurRadius: 5.0,
-                              spreadRadius: 5.0,
+                              color: Colors.black.withOpacity(.1),
+                              blurRadius: 3.0,
+                              spreadRadius: 3.0,
                               offset: Offset(5.0, 5.0)),
                         ], borderRadius: BorderRadius.circular(60.r)),
                         child: ElevatedButton(

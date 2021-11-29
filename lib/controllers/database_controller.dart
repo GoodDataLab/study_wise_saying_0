@@ -12,7 +12,7 @@ class DatabaseController {
   }
 
   Future<DocumentSnapshot> getPost({required String postId}) async {
-    print('postId: $postId');
+    //print('postId: $postId');
     return FirebaseFirestore.instance.collection('post').doc(postId).get();
   }
 

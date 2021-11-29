@@ -71,23 +71,27 @@ class _OnBoarding3State extends State<OnBoarding3> {
                   FadeIn(
                     duration: Duration(seconds: 1),
                     child: Container(
-                      child: Image.asset(
-                        'assets/images/second.gif',
-                        //width: 300.w,
-                        //height: 300.h,
+                      child: ClipRRect(
+                        child: Image.asset('assets/images/jjal_02.gif',
+                            fit: BoxFit.cover
+                            //width: 300.w,
+                            //height: 300.h,
+                            ),
+                        borderRadius: BorderRadius.circular(36.r),
                       ),
                       decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.black.withOpacity(.1),
-                                blurRadius: 5.0,
-                                spreadRadius: 3.0,
-                                offset: Offset(5.0, 5.0)),
-                          ],
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(36.r)),
-                      // width: 572.w,
-                      // height: 509.h,
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withOpacity(.1),
+                              blurRadius: 3.0,
+                              spreadRadius: 3.0,
+                              offset: Offset(5.0, 5.0)),
+                        ],
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(36.r),
+                      ),
+                      width: 552.w,
+                      height: 509.h,
                     ),
                   ),
                 ],

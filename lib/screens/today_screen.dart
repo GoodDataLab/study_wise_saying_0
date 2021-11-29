@@ -110,7 +110,7 @@ class _TodayScreenState extends State<TodayScreen>
   void dispose() {
     _tabController!.dispose();
     _goalEditingController?.dispose();
-    //admobController.initInterstitialAd().dispose();
+    admobController.initInterstitialAd().dispose();
     WidgetsBinding.instance!.removeObserver(this);
     if (_timerLink != null) {
       _timerLink?.cancel();
@@ -137,7 +137,7 @@ class _TodayScreenState extends State<TodayScreen>
     return GetBuilder(
       builder: (AppData appData) => WillPopScope(
         onWillPop: () {
-          //admobController.createInterstitialAd();
+          admobController.createInterstitialAd();
           showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -157,7 +157,7 @@ class _TodayScreenState extends State<TodayScreen>
           ),
           backgroundColor: kBackgroundColor,
           //앱 하단부에 배너 광고 표시
-          //bottomNavigationBar: AdsBottom(),
+          bottomNavigationBar: AdsBottom(),
           body: Column(
             children: [
               Container(
