@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-final int kMyVersion = 0;
+final int kMyVersion = 1;
 final int kMinimumVersionIfError = 9999;
 
 const double kDefaultMargin = 25.0;
